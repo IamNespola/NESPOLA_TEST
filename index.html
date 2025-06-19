@@ -25,6 +25,10 @@
           filter: invert(100%) hue-rotate(180deg);
           opacity: 0.3;
         }
+
+        .modal {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
     </style>
 </head>
 <body class="min-h-screen bg-white text-gray-800 antialiased">
@@ -44,16 +48,6 @@
             </div>
 
             <div class="hidden md:flex items-center space-x-6">
-            </div>
-
-            <div class="hidden md:flex items-center space-x-4">
-                <button class="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Đăng nhập
-                </button>
-                <button class="p-2 text-gray-600 hover:text-green-600 transition-colors duration-200
-                              dark:text-gray-300 dark:hover:text-green-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.78 1.25a2 2 0 0 0 .73 2.73l.04.02a2 2 0 0 1 .97 1.84v.08a2 2 0 0 1-.97 1.84l-.04.02a2 2 0 0 0-.73 2.73l.78 1.25a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.78-1.25a2 2 0 0 0-.73-2.73l-.04-.02a2 2 0 0 1-.97-1.84v-.08a2 2 0 0 1 .97-1.84l.04-.02a2 2 0 0 0 .73-2.73l-.78-1.25a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-                </button>
             </div>
 
             <div class="md:hidden">
@@ -110,7 +104,7 @@
                 href="#"
                 class="flex items-center justify-center px-8 py-4 border-2 border-gray-300 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-100 transition-all duration-300 transform hover:scale-105
                               dark:border-gray-600 dark:text-gray-100 dark:hover:bg-gray-700">
-                Đăng ký <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                Tìm hiểu thêm <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </a>
         </div>
     </main>
@@ -289,7 +283,14 @@
       </svg>
     </button>
 
-    <script>
+    <footer class="bg-gray-100 py-6 text-center text-gray-600 text-sm dark:bg-gray-900 dark:text-gray-400">
+        <div class="container mx-auto px-4">
+            <p>&copy; 2025 SERVER HVH BEDWAR NESPOLA. All rights reserved.</p>
+            <p class="mt-1">Cre: Jino</p>
+        </div>
+    </footer>
+
+    <script type="module">
         document.addEventListener('DOMContentLoaded', () => {
             const themeToggleBtn = document.getElementById('theme-toggle-btn');
             const themeIcon = document.getElementById('theme-icon');
