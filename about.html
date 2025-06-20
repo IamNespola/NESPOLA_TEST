@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Về chúng tôi - SERVER HVH BEDWAR NESPOLA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Link Font Awesome để dùng icon Discord vector -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-400 { animation-delay: 0.4s; }
+
+        .modal {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        .card-effect {
+            border: 1px solid transparent;
+            transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+        .card-effect:hover {
+            border-color: #34D399;
+            box-shadow: 0 10px 15px -3px rgba(52, 211, 153, 0.3), 0 4px 6px -2px rgba(52, 211, 153, 0.15);
+            transform: translateY(-5px);
+        }
+        /* Custom selection highlight color - border-radius is NOT supported here */
+        ::selection {
+            background-color: #34D399; /* Green-500 */
+            color: #ffffff; /* White text on selection */
+        }
+        ::-moz-selection { /* For Firefox */
+            background-color: #34D399;
+            color: #ffffff;
+        }
+
+        .modal-overlay {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.open {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-content {
+            transform: translateY(20px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .modal-overlay.open .modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-white text-gray-800 antialiased">
+    <!-- Background pattern and gradient - Keep consistent with index.html -->
+    <div class="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100 z-0 pointer-events-none"></div>
+    <div class="absolute inset-0 z-0 pointer-events-none" style="
+        background-image: url(&quot;data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zm0 20v-4H4v4H0v2h4v4h2v-4h4v-2H6zM36 4V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 4V0H4v4H0v2h4v4h2V6h4V4H6zM21 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM21 0v-4h-2v4h-4v2h4v4h2V6h4V4h-4zM41 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM41 0v-4h-2v4h-4v2h4v4h2V6h4V4h-4zM11 9v-4h-2v4H5v2h4v4h2v-4h4V9h-4zm0 20v-4h-2v4H5v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4H5v2h4v4h2v-4h4v-2h-4zm30-30v-4h-2v4h-4v2h4v4h2v-4h4V9h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E&quot;);
+        background-size: 100px 100px;"></div>
+
+    <!-- Main Content Section for About Page -->
+    <!-- This section can be placed inside the main tag of your index.html if you want to use a single page application structure,
+         or simply placed in a new about.html file with your index.html's header and footer around it. -->
+    <main class="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-6rem)] text-center px-4 py-16 md:py-24">
+        <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight mb-4 animate-fade-in-up">
+            Về SERVER HVH BEDWAR <br />
+            <span class="text-green-600">NESPOLA</span>
+        </h1>
+
+        <p class="text-lg md:text-xl text-gray-600 max-w-2xl mb-8 animate-fade-in-up delay-200">
+            Chúng tôi là cộng đồng Bedwars HVH nhiệt huyết, nơi bạn có thể trải nghiệm những trận đấu căng thẳng, nâng cao kỹ năng và kết nối với những người chơi cùng đam mê!
+        </p>
+
+        <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 animate-fade-in-up delay-400">
+            <a
+                href="index.html"
+                class="flex items-center justify-center px-8 py-4 bg-green-500 text-white font-semibold rounded-lg shadow-lg hover:bg-green-600 transition-all duration-300 transform hover:scale-105"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+                    <path d="M12 19L5 12l7-7M19 12H5"/>
+                </svg>
+                Quay lại Trang chủ
+            </a>
+            <button
+                id="join-server-btn"
+                class="flex items-center justify-center px-8 py-4 bg-blue-500 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-600 transition-all duration-300 transform hover:scale-105"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+                    <path d="M12 5v14"/><path d="m19 12-7 7-7-7"/>
+                </svg>
+                Server IP
+            </button>
+        </div>
+    </main>
+
+    <section id="about-sections" class="relative z-10 py-16 md:py-24 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20 items-center">
+                <div class="order-2 md:order-1">
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
+                        Sứ mệnh của chúng tôi
+                    </h2>
+                    <p class="text-lg text-gray-600 mb-6">
+                        Xây dựng một cộng đồng Bedwars HVH vững mạnh, nơi người chơi có thể thỏa sức thể hiện kỹ năng, học hỏi và phát triển cùng nhau trong môi trường công bằng, cạnh tranh lành mạnh.
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700">
+                        <p class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-600"><path d="M22 12H2"/><path d="M15 19l7-7-7-7"/></svg> Môi trường công bằng</p>
+                        <p class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-600">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                            Cộng đồng thân thiện
+                        </p>
+                        <p class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-600"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76a6 6 0 0 0-8.49 0"/><path d="M11.66 16.34a2 2 0 0 0 2.83 0"/></svg> Phát triển kỹ năng</p>
+                        <p class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-600"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v6"/><path d="m15 15-3 3-3-3"/></svg> Giải đấu thường xuyên</p>
+                    </div>
+                </div>
+                <!-- Image for Mission Section -->
+                <div class="order-1 md:order-2 flex justify-center items-center w-full max-w-md bg-cover bg-center bg-no-repeat rounded-lg overflow-hidden shadow-lg aspect-video card-effect group"
+                    style="background-image: url('./anh-team.png');">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20 items-center">
+                <!-- Image for Vision Section -->
+                <div class="order-1 md:order-1 flex justify-center items-center w-full max-w-md bg-cover bg-center bg-no-repeat rounded-lg overflow-hidden shadow-lg aspect-video card-effect group"
+                    style="background-image: url('./anh-congdong.png');">
+                </div>
+                <div class="order-2 md:order-2">
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
+                        Tầm nhìn của chúng tôi
+                    </h2>
+                    <p class="text-lg text-gray-600 mb-6">
+                        Trở thành server Bedwars HVH hàng đầu, là sân chơi lý tưởng cho mọi game thủ, nơi đam mê được thắp sáng và tài năng được công nhận.
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700">
+                        <p class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-600"><path d="M6 8a6 6 0 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> Sân chơi lý tưởng</p>
+                        <p class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-600"><path d="M22 12H2"/><path d="M18 5l4 7-4 7"/><path d="M6 5l-4 7 4 7"/></svg> Luôn đổi mới</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
+                    Giá trị cốt lõi
+                </h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                    Chúng tôi đặt sự công bằng, tôn trọng và niềm vui của người chơi lên hàng đầu.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="p-6 bg-white rounded-lg shadow-md flex items-start space-x-4 card-effect group">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 mt-1"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76a6 6 0 0 0-8.49 0"/><path d="M11.66 16.34a2 2 0 0 0 2.83 0"/></svg>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Công bằng</h3>
+                        <p class="text-gray-600">Đảm bảo mọi người chơi đều có cơ hội như nhau, không có gian lận.</p>
+                    </div>
+                </div>
+                <div class="p-6 bg-white rounded-lg shadow-md flex items-start space-x-4 card-effect group">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 mt-1"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Tôn trọng</h3>
+                        <p class="text-gray-600">Xây dựng môi trường chơi game văn minh, tôn trọng lẫn nhau.</p>
+                    </div>
+                </div>
+                <div class="p-6 bg-white rounded-lg shadow-md flex items-start space-x-4 card-effect group">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 mt-1"><path d="m15 5 6 6-6 6"/><path d="M3 12h18"/></svg>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Niềm vui</h3>
+                        <p class="text-gray-600">Mang lại những giờ phút giải trí sảng khoái và đáng nhớ.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-20">
+                <div class="flex justify-center mb-8">
+                    <svg
+                      width="64"
+                      height="64"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="text-green-600"
+                    >
+                      <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z" />
+                      <path d="M14.71 14.71L12 17.41l-2.71-2.71a4 4 0 1 1 5.42 0z" />
+                      <path d="M16 12l-4 4-4-4" />
+                      <path d="M12 8V2" />
+                      <path d="M12 22V16" />
+                      <path d="M22 12H16" />
+                      <path d="M8 12H2" />
+                      <circle cx="12" cy="12" r="2" />
+                    </svg>
+                </div>
+                <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">
+                    Tham gia cộng đồng NESPOLA ngay!
+                </h2>
+                <a
+                    href="https://discord.gg/gYTRrGx8Vv"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105"
+                >
+                    <i class="fab fa-discord w-5 h-5 mr-2 text-xl"></i>
+                    Tham gia Discord
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Join Server Modal - Keep consistent with index.html -->
+    <div id="join-server-modal" class="modal-overlay fixed inset-0 flex items-center justify-center z-50">
+        <div class="modal-content bg-white p-8 rounded-lg shadow-xl relative w-11/12 max-w-sm">
+            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">Tham gia Server NESPOLA</h3>
+            <p class="text-gray-700 mb-4">Sao chép địa chỉ IP sau để kết nối:</p>
+            <div class="bg-gray-100 p-3 rounded-lg text-lg font-mono text-gray-800 break-all mb-6 flex justify-between items-center">
+                <span id="server-ip-display">19.ip.gl.ply.gg:53605</span>
+                <button id="copy-ip-btn" class="ml-4 p-2 rounded-full bg-green-500 text-white hover:bg-green-600 transition-colors duration-200" title="Sao chép IP">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                </button>
+            </div>
+            <p id="copy-message" class="text-green-600 text-sm opacity-0 transition-opacity duration-300">Đã sao chép!</p>
+        </div>
+    </div>
+
+    <script type="module">
+        document.addEventListener('DOMContentLoaded', () => {
+            const joinServerBtn = document.getElementById('join-server-btn');
+            const joinServerModal = document.getElementById('join-server-modal');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const copyIpBtn = document.getElementById('copy-ip-btn');
+            const serverIpDisplay = document.getElementById('server-ip-display');
+            const copyMessage = document.getElementById('copy-message');
+
+            // Show modal
+            if (joinServerBtn) { // Check if element exists before adding listener
+                joinServerBtn.addEventListener('click', () => {
+                    joinServerModal.classList.add('open');
+                    copyMessage.style.opacity = '0'; // Reset copy message visibility
+                });
+            }
+
+            // Close modal functions
+            const closeAndResetModal = () => {
+                joinServerModal.classList.remove('open');
+            };
+
+            if (closeModalBtn) { // Check if element exists before adding listener
+                closeModalBtn.addEventListener('click', closeAndResetModal);
+            }
+
+            // Close modal when clicking outside of it
+            if (joinServerModal) { // Check if element exists before adding listener
+                joinServerModal.addEventListener('click', (e) => {
+                    if (e.target === joinServerModal) {
+                        closeAndResetModal();
+                    }
+                });
+            }
+
+            // Copy IP to clipboard
+            if (copyIpBtn) { // Check if element exists before adding listener
+                copyIpBtn.addEventListener('click', () => {
+                    const ipAddress = serverIpDisplay.textContent;
+                    const textarea = document.createElement('textarea');
+                    textarea.value = ipAddress;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+
+                    // Show "Copied!" message
+                    copyMessage.style.opacity = '1';
+                    setTimeout(() => {
+                        copyMessage.style.opacity = '0';
+                    }, 2000); // Hide after 2 seconds
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+<!-- Footer Section - Keep consistent with index.html -->
+<footer class="bg-gray-800 text-white py-8">
+    <div class="container mx-auto text-center">
+        <p class="text-sm mb-2">© 2023 SERVER HVH BEDWAR NESPOLA. All rights reserved.</p>
+        <p class="text-xs">Designed with ❤️ by <a href="
+                
