@@ -21,38 +21,49 @@
         .delay-200 { animation-delay: 0.2s; }
         .delay-400 { animation-delay: 0.4s; }
 
-        .dark .bg-pattern-effect {
-          filter: invert(100%) hue-rotate(180deg);
-          opacity: 0.3;
-        }
-
         .modal {
             background-color: rgba(0, 0, 0, 0.7);
+        }
+        .card-effect {
+            border: 1px solid transparent;
+            transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+        .card-effect:hover {
+            border-color: #34D399;
+            box-shadow: 0 10px 15px -3px rgba(52, 211, 153, 0.3), 0 4px 6px -2px rgba(52, 211, 153, 0.15);
+            transform: translateY(-5px);
+        }
+        /* Custom selection highlight color */
+        ::selection {
+          background-color: #34D399; /* Green-500 */
+          color: #ffffff; /* White text on selection */
+        }
+        ::-moz-selection { /* For Firefox */
+          background-color: #34D399;
+          color: #ffffff;
         }
     </style>
 </head>
 <body class="min-h-screen bg-white text-gray-800 antialiased">
-    <div class="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100 opacity-50 z-0 pointer-events-none
-                dark:from-gray-800 dark:via-gray-900 dark:to-gray-800 bg-pattern-effect"></div>
+    <div class="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100 z-0 pointer-events-none"></div>
     <div class="absolute inset-0 z-0 pointer-events-none" style="
         background-image: url(&quot;data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zm0 20v-4H4v4H0v2h4v4h2v-4h4v-2H6zM36 4V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 4V0H4v4H0v2h4v4h2V6h4V4H6zM21 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM21 0v-4h-2v4h-4v2h4v4h2V6h4V4h-4zM41 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM41 0v-4h-2v4h-4v2h4v4h2V6h4V4h-4zM11 9v-4h-2v4H5v2h4v4h2v-4h4V9h-4zm0 20v-4h-2v4H5v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4H5v2h4v4h2v-4h4v-2h-4zm30-30v-4h-2v4h-4v2h4v4h2v-4h4V9h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E&quot;);
         background-size: 100px 100px;"></div>
 
-    <header class="relative z-10 bg-white shadow-sm dark:bg-gray-800 dark:shadow-lg">
+    <header class="relative z-10 bg-white shadow-sm">
         <nav class="container mx-auto px-4 py-4 flex items-center justify-between">
             <div class="flex items-center space-x-2">
-                <div class="flex items-center justify-center h-8 md:h-10 px-4 bg-gray-200 text-gray-800 font-semibold rounded-lg
-                            dark:bg-gray-700 dark:text-gray-200">
+                <div class="flex items-center justify-center h-8 md:h-10 px-4 bg-gray-200 text-gray-800 font-semibold rounded-lg">
                     Logo
                 </div>
             </div>
 
-            <div class="hidden md:flex items-center space-x-6">
+            <div class="flex items-center space-x-4">
+                <span class="text-gray-600 font-semibold text-sm">v1.1</span>
             </div>
-
+            
             <div class="md:hidden">
-                <button class="p-2 text-gray-600 hover:text-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 rounded-md
-                              dark:text-gray-300 dark:hover:text-green-500 dark:focus:ring-green-600">
+                <button class="p-2 text-gray-600 hover:text-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 rounded-md">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
@@ -62,14 +73,12 @@
     </header>
 
     <main class="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-6rem)] text-center px-4 py-16 md:py-24">
-        <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight mb-4 animate-fade-in-up
-                    dark:text-gray-50">
+        <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight mb-4 animate-fade-in-up">
             SERVER HVH BEDWAR <br />
             <span class="text-green-600">NESPOLA</span>
         </h1>
 
-        <p class="text-lg md:text-xl text-gray-600 max-w-2xl mb-8 animate-fade-in-up delay-200
-                    dark:text-gray-300">
+        <p class="text-lg md:text-xl text-gray-600 max-w-2xl mb-8 animate-fade-in-up delay-200">
             Khám phá thế giới Bedwars đầy kịch tính, chinh phục mọi đối thủ và trải nghiệm những trận chiến bất tận cùng cộng đồng NESPOLA!
         </p>
 
@@ -102,52 +111,45 @@
             </a>
             <a
                 href="#"
-                class="flex items-center justify-center px-8 py-4 border-2 border-gray-300 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-100 transition-all duration-300 transform hover:scale-105
-                              dark:border-gray-600 dark:text-gray-100 dark:hover:bg-gray-700">
+                class="flex items-center justify-center px-8 py-4 border-2 border-gray-300 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-100 transition-all duration-300 transform hover:scale-105">
                 Tìm hiểu thêm <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </a>
         </div>
     </main>
 
-    <section id="content-sections" class="relative z-10 py-16 md:py-24 bg-gray-50 dark:bg-gray-800">
+    <section id="content-sections" class="relative z-10 py-16 md:py-24 bg-gray-50">
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20 items-center">
                 <div class="order-2 md:order-1">
-                    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 dark:text-gray-50">
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
                         Kết nối và Chiến đấu
                     </h2>
-                    <p class="text-lg text-gray-600 mb-6 dark:text-gray-300">
+                    <p class="text-lg text-gray-600 mb-6">
                         Kết nối với server NESPOLA dễ dàng và nhanh chóng. Chọn chế độ Bedwars yêu thích, tham gia trận đấu và bắt đầu cuộc chiến đầy kịch tính chỉ với vài bước đơn giản!
                     </p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700 dark:text-gray-200">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700">
                         <p class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-600"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76a6 6 0 0 0-8.49 0"/><path d="M11.66 16.34a2 2 0 0 0 2.83 0"/></svg> Phát hiện trận đấu nhanh</p>
                         <p class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-600"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Kết nối cộng đồng</p>
                         <p class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-600"><path d="M22 12H2"/><path d="M15 19l7-7-7-7"/></svg> Trải nghiệm mượt mà</p>
                         <p class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-600"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v6"/><path d="m15 15-3 3-3-3"/></svg> Server ổn định</p>
                     </div>
                 </div>
-                <div class="order-1 md:order-2 flex justify-center items-center">
-                    <div class="w-full max-w-md bg-gray-200 rounded-lg overflow-hidden shadow-lg aspect-video flex items-center justify-center text-gray-600
-                                dark:bg-gray-700 dark:text-gray-300">
+                <div class="order-1 md:order-2 flex justify-center items-center w-full max-w-md bg-gray-200 rounded-lg overflow-hidden shadow-lg aspect-video flex items-center justify-center text-gray-600 card-effect group">
                                             </div>
-                </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20 items-center">
-                <div class="order-1 md:order-1 flex justify-center items-center">
-                    <div class="w-full max-w-md bg-gray-200 rounded-lg overflow-hidden shadow-lg aspect-video flex items-center justify-center text-gray-600
-                                dark:bg-gray-700 dark:text-gray-300">
+                <div class="order-1 md:order-1 flex justify-center items-center w-full max-w-md bg-gray-200 rounded-lg overflow-hidden shadow-lg aspect-video flex items-center justify-center text-gray-600 card-effect group">
                                             </div>
-                </div>
                 <div class="order-2 md:order-2">
-                    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 dark:text-gray-50">
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
                         Theo dõi các event bạn yêu thích
                     </h2>
-                    <p class="text-lg text-gray-600 mb-6 dark:text-gray-300">
+                    <p class="text-lg text-gray-600 mb-6">
                         Nhận thông báo mỗi khi các sự kiện hoặc giải đấu mới được tổ chức và luôn nắm bắt mọi thông tin quan trọng nhất.
                     </p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700 dark:text-gray-200">
-                        <p class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-600"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> Thông báo sự kiện</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700">
+                        <p class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-600"><path d="M6 8a6 6 0 = 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> Thông báo sự kiện</p>
                         <p class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-600"><path d="M22 12H2"/><path d="M18 5l4 7-4 7"/><path d="M6 5l-4 7 4 7"/></svg> Cập nhật thường xuyên</p>
                     </div>
                 </div>
@@ -155,74 +157,71 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20 items-center">
                 <div class="order-2 md:order-1">
-                    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 dark:text-gray-50">
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
                         Anti-cheat mạnh mẽ
                     </h2>
-                    <p class="text-lg text-gray-600 mb-6 dark:text-gray-300">
-                        Hệ thống chống gian lận tiên tiến đảm bảo môi trường chơi game công bằng, không hack/cheat, mang lại trải nghiệm tuyệt vời nhất cho mọi người chơi.
+                    <p class="text-lg text-gray-600 mb-6">
+                        Hệ thống chống gian lận tiên tiến của chúng tôi được thiết kế để quản lý và cân bằng các cuộc chiến HVH, đảm bảo một môi trường độc đáo nơi các hack được kiểm soát để tạo ra trải nghiệm chiến đấu đỉnh cao, đầy thử thách và kịch tính.
                     </p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700 dark:text-gray-200">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700">
                         <p class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-600"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg> Bảo vệ công bằng</p>
                         <p class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-600"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> Phát hiện và xử lý tức thì</p>
                     </div>
                 </div>
-                <div class="order-1 md:order-2 flex justify-center items-center">
-                    <div class="w-full max-w-md bg-gray-200 rounded-lg overflow-hidden shadow-lg aspect-video flex items-center justify-center text-gray-600
-                                dark:bg-gray-700 dark:text-gray-300">
+                <div class="order-1 md:order-2 flex justify-center items-center w-full max-w-md bg-gray-200 rounded-lg overflow-hidden shadow-lg aspect-video flex items-center justify-center text-gray-600 card-effect group">
                                             </div>
-                </div>
             </div>
 
             <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 dark:text-gray-50">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
                     Chinh phục mọi thử thách, làm chủ cuộc chơi!
                 </h2>
-                <p class="text-lg text-gray-600 max-w-3xl mx-auto dark:text-gray-300">
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">
                     Trải nghiệm Bedwars HVH đỉnh cao với các tính năng độc quyền, giúp bạn nâng tầm kỹ năng và thể hiện bản lĩnh.
                 </p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="p-6 bg-white rounded-lg shadow-md flex items-start space-x-4 dark:bg-gray-700 dark:shadow-xl">
+                <div class="p-6 bg-white rounded-lg shadow-md flex items-start space-x-4 card-effect group">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 mt-1"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76a6 6 0 0 0-8.49 0"/><path d="M11.66 16.34a2 2 0 0 0 2.83 0"/></svg>
                     <div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2 dark:text-gray-100">Khám phá chiến trường</h3>
-                        <p class="text-gray-600 dark:text-gray-300">Khám phá đa dạng các bản đồ Bedwars với địa hình và chiến thuật độc đáo, không ngừng đổi mới.</p>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Khám phá chiến trường</h3>
+                        <p class="text-gray-600">Khám phá đa dạng các bản đồ Bedwars với địa hình và chiến thuật độc đáo, không ngừng đổi mới.</p>
                     </div>
                 </div>
-                <div class="p-6 bg-white rounded-lg shadow-md flex items-start space-x-4 dark:bg-gray-700 dark:shadow-xl">
+                <div class="p-6 bg-white rounded-lg shadow-md flex items-start space-x-4 card-effect group">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 mt-1"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                     <div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2 dark:text-gray-100">Đội hình bất bại</h3>
-                        <p class="text-gray-600 dark:text-gray-300">Lập đội cùng bạn bè, xây dựng chiến thuật thông minh và phối hợp ăn ý để thống trị mọi trận đấu.</p>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Đội hình bất bại</h3>
+                        <p class="text-gray-600">Lập đội cùng bạn bè, xây dựng chiến thuật thông minh và phối hợp ăn ý để thống trị mọi trận đấu.</p>
                     </div>
                 </div>
-                <div class="p-6 bg-white rounded-lg shadow-md flex items-start space-x-4 dark:bg-gray-700 dark:shadow-xl">
+                <div class="p-6 bg-white rounded-lg shadow-md flex items-start space-x-4 card-effect group">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 mt-1"><path d="m15 5 6 6-6 6"/><path d="M3 12h18"/></svg>
                     <div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2 dark:text-gray-100">Thăng cấp & Nhận thưởng</h3>
-                        <p class="text-gray-600 dark:text-gray-300">Đạt thứ hạng cao trên bảng xếp hạng, mở khóa phần thưởng độc quyền và chứng tỏ kỹ năng của bạn.</p>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Thăng cấp & Nhận thưởng</h3>
+                        <p class="text-gray-600">Đạt thứ hạng cao trên bảng xếp hạng, mở khóa phần thưởng độc quyền và chứng tỏ kỹ năng của bạn.</p>
                     </div>
                 </div>
-                <div class="p-6 bg-white rounded-lg shadow-md flex items-start space-x-4 dark:bg-gray-700 dark:shadow-xl">
+                <div class="p-6 bg-white rounded-lg shadow-md flex items-start space-x-4 card-effect group">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 mt-1"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
                     <div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2 dark:text-gray-100">Chế độ độc đáo</h3>
-                        <p class="text-gray-600 dark:text-gray-300">Trải nghiệm nhiều chế độ chơi Bedwars độc đáo, cùng các sự kiện và giải đấu hấp dẫn được tổ chức thường xuyên.</p>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Chế độ độc đáo</h3>
+                        <p class="text-gray-600">Trải nghiệm nhiều chế độ chơi Bedwars độc đáo, cùng các sự kiện và giải đấu hấp dẫn được tổ chức thường xuyên.</p>
                     </div>
                 </div>
-                <div class="p-6 bg-white rounded-lg shadow-md flex items-start space-x-4 dark:bg-gray-700 dark:shadow-xl">
+                <div class="p-6 bg-white rounded-lg shadow-md flex items-start space-x-4 card-effect group">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 mt-1"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
                     <div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2 dark:text-gray-100">Thống kê chi tiết</h3>
-                        <p class="text-gray-600 dark:text-gray-300">Theo dõi mọi chỉ số: KDA, win-rate, số trận thắng, và thứ hạng của bạn để cải thiện kỹ năng.</p>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Thống kê chi tiết</h3>
+                        <p class="text-gray-600">Theo dõi mọi chỉ số: KDA, win-rate, số trận thắng, và thứ hạng của bạn để cải thiện kỹ năng.</p>
                     </div>
                 </div>
-                <div class="p-6 bg-white rounded-lg shadow-md flex items-start space-x-4 dark:bg-gray-700 dark:shadow-xl">
+                <div class="p-6 bg-white rounded-lg shadow-md flex items-start space-x-4 card-effect group">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 mt-1"><path d="M22 12H2"/><path d="M18 5l4 7-4 7"/><path d="M6 5l-4 7 4 7"/></svg>
                     <div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2 dark:text-gray-100">Cập nhật không ngừng</h3>
-                        <p class="text-gray-600 dark:text-gray-300">Máy chủ luôn được cập nhật các bản đồ, chế độ mới và tối ưu hóa hiệu suất để mang lại trải nghiệm mượt mà nhất.</p>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Cập nhật không ngừng</h3>
+                        <p class="text-gray-600">Máy chủ luôn được cập nhật các bản đồ, chế độ mới và tối ưu hóa hiệu suất để mang lại trải nghiệm mượt mà nhất.</p>
                     </div>
                 </div>
             </div>
@@ -250,7 +249,7 @@
                       <circle cx="12" cy="12" r="2" />
                     </svg>
                 </div>
-                <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 dark:text-gray-50">
+                <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">
                     Tìm hiểu thêm về NESPOLA
                 </h2>
                 <a
@@ -263,27 +262,7 @@
         </div>
     </section>
 
-    <button
-      id="theme-toggle-btn"
-      class="fixed bottom-6 right-6 p-3 rounded-full bg-gray-200 shadow-lg text-gray-700
-             hover:bg-gray-300 transition-colors duration-200
-             dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-      aria-label="Toggle dark mode"
-    >
-      <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="4"/>
-        <path d="M12 2v2"/>
-        <path d="M12 20v2"/>
-        <path d="M4.22 4.22l1.42 1.42"/>
-        <path d="M18.36 18.36l1.42 1.42"/>
-        <path d="M2 12h2"/>
-        <path d="M20 12h2"/>
-        <path d="M4.22 19.78l1.42-1.42"/>
-        <path d="M18.36 5.64l1.42-1.42"/>
-      </svg>
-    </button>
-
-    <footer class="bg-gray-100 py-6 text-center text-gray-600 text-sm dark:bg-gray-900 dark:text-gray-400">
+    <footer class="bg-gray-100 py-6 text-center text-gray-600 text-sm">
         <div class="container mx-auto px-4">
             <p>&copy; 2025 SERVER HVH BEDWAR NESPOLA. All rights reserved.</p>
             <p class="mt-1">Cre: Jino</p>
@@ -292,47 +271,6 @@
 
     <script type="module">
         document.addEventListener('DOMContentLoaded', () => {
-            const themeToggleBtn = document.getElementById('theme-toggle-btn');
-            const themeIcon = document.getElementById('theme-icon');
-            const htmlElement = document.documentElement;
-
-            const setIcon = (currentTheme) => {
-                if (currentTheme === 'light') {
-                    themeIcon.innerHTML = `
-                        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
-                    `;
-                } else {
-                    themeIcon.innerHTML = `
-                        <circle cx="12" cy="12" r="4"/>
-                        <path d="M12 2v2"/>
-                        <path d="M12 20v2"/>
-                        <path d="M4.22 4.22l1.42 1.42"/>
-                        <path d="M18.36 18.36l1.42 1.42"/>
-                        <path d="M2 12h2"/>
-                        <path d="M20 12h2"/>
-                        <path d="M4.22 19.78l1.42-1.42"/>
-                        <path d="M18.36 5.64l1.42-1.42"/>
-                    `;
-                }
-            };
-
-            let currentTheme = localStorage.getItem('theme') || 'light';
-            if (currentTheme === 'dark') {
-                htmlElement.classList.add('dark');
-            }
-            setIcon(currentTheme);
-
-            themeToggleBtn.addEventListener('click', () => {
-                currentTheme = currentTheme === 'light' ? 'dark' : 'light';
-                localStorage.setItem('theme', currentTheme);
-                if (currentTheme === 'dark') {
-                    htmlElement.classList.add('dark');
-                } else {
-                    htmlElement.classList.remove('dark');
-                }
-                setIcon(currentTheme);
-            });
-
             const exploreBtn = document.getElementById('explore-server-btn');
             exploreBtn.addEventListener('click', (e) => {
                 e.preventDefault();
