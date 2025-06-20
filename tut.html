@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hướng dẫn chơi - Server Nespola</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Custom CSS for base styling and animations */
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Keyframe animation for initial fade-in effects */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Apply initial fade-in animation to specific elements */
+        .animate-fade-in-up {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        /* Add delays for staggered animation */
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-400 { animation-delay: 0.4s; }
+
+        /* Styles for scroll-triggered animation */
+        .scroll-animate {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .scroll-animate.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Modal overlay styling */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.7);
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.open {
+            visibility: visible;
+            opacity: 1;
+        }
+        /* Modal content animation */
+        .modal-content {
+            transform: translateY(20px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .modal-overlay.open .modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Card hover effect - Matching the original image's light border on hover */
+        .card-effect:hover {
+            border-color: #34D399; /* Green-500 for border */
+            box-shadow: 0 10px 15px -3px rgba(52, 211, 153, 0.3), 0 4px 6px -2px rgba(52, 211, 153, 0.15); /* Matching shadow */
+            transform: translateY(-5px); /* Slight lift */
+        }
+
+        /* Custom selection highlight color */
+        ::selection {
+            background-color: #34D399; /* Green-500 */
+            color: #ffffff; /* White text on selection */
+        }
+        ::-moz-selection { /* For Firefox */
+            background-color: #34D399;
+            color: #ffffff;
+        }
+
+        /* Styles for the progress line in the 'How to Play' section, matching image */
+        .progress-line {
+            position: absolute;
+            left: 20px; /* Aligns with the center of the icons */
+            top: 0;
+            bottom: 0;
+            width: 2px; /* Thinner line like in the image */
+            background-color: #E2E8F0; /* Light gray for light theme */
+            border-radius: 1px;
+            z-index: 0;
+        }
+
+        .step-icon-container {
+            position: relative;
+            z-index: 1;
+            /* Background and border color matching light theme now */
+            background-color: #F8FAFC; /* Light background for the icon circle */
+            border: 1px solid #CBD5E0; /* Subtle border */
+        }
+        /* Color overrides for specific icons as per the provided image, but keeping them vibrant */
+        .icon-register { background-color: #48BB78; } /* Green */
+        .icon-download { background-color: #DD6B20; } /* Orange */
+        .icon-join { background-color: #ED64A6; } /* Pink */
+
+        /* Styles for the new header logo and version text */
+        .nespola-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background-color: #F8FAFC; /* Light background for the new header */
+            border-bottom: 1px solid #E2E8F0; /* Subtle border */
+        }
+        .nespola-logo {
+            height: 40px; /* Adjust height as needed */
+            width: auto;
+        }
+        .nespola-version {
+            font-size: 0.875rem; /* text-sm */
+            color: #A0AEC0; /* gray-400 */
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-white text-gray-800 antialiased">
+    <!-- Background pattern and gradient - Changed to light theme -->
+    <div class="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100 z-0 pointer-events-none"></div>
+    <div class="absolute inset-0 z-0 pointer-events-none" style="
+        background-image: url(&quot;data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zm0 20v-4H4v4H0v2h4v4h2v-4h4v-2H6zM36 4V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 4V0H4v4H0v2h4v4h2V6h4V4H6zM21 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM21 0v-4h-2v4h-4v2h4v4h2V6h4V4h-4zM41 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM41 0v-4h-2v4h-4v2h4v4h2V6h4V4h-4zM11 9v-4h-2v4H5v2h4v4h2v-4h4V9h-4zm0 20v-4h-2v4H5v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4H5v2h4v4h2v-4h4v-2h-4zm30-30v-4h-2v4h-4v2h4v4h2v-4h4V9h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E&quot;);
+        background-size: 100px 100px;"></div>
+
+    <header class="relative z-10 bg-white shadow-sm">
+        <nav class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <!-- Logo của server -->
+                <img src="./logo.png" alt="NESPOLA Server Logo" class="h-10 md:h-12 object-contain">
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <span class="text-gray-600 font-semibold text-sm">v1.2</span>
+            </div>
+            
+            <div class="md:hidden">
+                <button class="p-2 text-gray-600 hover:text-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 rounded-md">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content Section - How to Play -->
+    <main class="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-8rem)] text-center px-4 py-16 md:py-24">
+        <section class="max-w-4xl mx-auto py-16 md:py-24">
+            <h2 class="text-3xl md:text-5xl font-extrabold text-gray-900 mb-12 scroll-animate">
+                Làm thế nào để chơi <span class="text-green-600">Server Nespola</span> ?
+            </h2>
+
+            <div class="relative flex flex-col items-start space-y-12 md:space-y-20 pl-8 md:pl-0">
+                <!-- Progress Line -->
+                <div class="absolute progress-line left-4 md:left-1/2 md:-translate-x-1/2"></div>
+
+                <!-- Step 1: Create Account -->
+                <div class="relative flex items-start text-left w-full scroll-animate">
+                    <div class="step-icon-container flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center mr-6 text-white icon-register">
+                        <!-- Icon for Register -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                    </div>
+                    <div class="p-6 bg-white rounded-xl shadow-lg card-effect flex-grow">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Tạo một tài khoản Server Nespola</h3>
+                        <p class="text-gray-600 mb-4">Bạn cần phải tạo tài khoản trước khi vào chơi.</p>
+                        <p class="text-gray-500 text-sm mb-4">Lưu ý: Hệ thống tài khoản của chúng tôi không có liên quan đến Mojang và Minecraft.</p>
+                        <button class="px-5 py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition-colors duration-300 transform hover:scale-105">
+                            Đăng ký >
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Download Minecraft -->
+                <div class="relative flex items-start text-left w-full scroll-animate">
+                    <div class="step-icon-container flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center mr-6 text-white icon-download">
+                        <!-- Icon for Download -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                    </div>
+                    <div class="p-6 bg-white rounded-xl shadow-lg card-effect flex-grow">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Tải về Minecraft</h3>
+                        <p class="text-gray-600 mb-4">Bạn cần cài đặt game Minecraft để có thể chơi tại Server Nespola.</p>
+                        <p class="text-gray-500 text-sm mb-4">Nếu bạn không biết tải ở đâu, hãy click vào link dưới đây.</p>
+                        <button class="px-5 py-2 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 transition-colors duration-300 transform hover:scale-105">
+                            Tải xuống >
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Join Server Nespola -->
+                <div class="relative flex items-start text-left w-full scroll-animate">
+                    <div class="step-icon-container flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center mr-6 text-white icon-join">
+                        <!-- Icon for Join -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 18a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2"/><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M12 12V2"/>
+                        </svg>
+                    </div>
+                    <div class="p-6 bg-white rounded-xl shadow-lg card-effect flex-grow">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Tham gia vào Server Nespola</h3>
+                        <p class="text-gray-600 mb-4">Sao chép địa chỉ IP và thêm vào danh sách máy chủ của bạn.</p>
+                        <p class="text-gray-500 text-sm mb-4">Sau khi vào Server Nespola, hãy đăng nhập bằng tài khoản mà bạn đã đăng ký.</p>
+                        <button id="copy-ip-button-inline" class="inline-flex items-center justify-center px-5 py-2 bg-pink-500 text-white font-semibold rounded-lg hover:bg-pink-600 transition-colors duration-300 transform hover:scale-105">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                            Sao chép IP
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="relative z-10 py-12 md:py-16 bg-gray-100 text-center text-gray-500">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6 animate-fade-in-up">
+                Chào mừng bạn đến với <span class="text-green-600">Server Nespola</span>, chúng tôi đang đón chờ bạn.
+            </h2>
+            <!-- Removed the "CHƠI NGAY" button as requested -->
+            <!--
+            <a
+                href="#"
+                class="inline-flex items-center px-8 py-4 bg-green-500 text-white font-semibold rounded-lg shadow-lg hover:bg-green-600 transition-all duration-300 transform hover:scale-105 mb-8"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                CHƠI NGAY
+            </a>
+            -->
+
+            <p class="text-sm text-gray-600 mt-8">
+                &copy; 2025 Server Nespola. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Join Server Modal (IP Copy Functionality) -->
+    <div id="join-server-modal" class="modal-overlay fixed inset-0 flex items-center justify-center z-50">
+        <div class="modal-content bg-white p-8 rounded-lg shadow-xl relative w-11/12 max-w-sm">
+            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">Tham gia Server Nespola</h3>
+            <p class="text-gray-700 mb-4">Sao chép địa chỉ IP sau để kết nối:</p>
+            <div class="bg-gray-100 p-3 rounded-lg text-lg font-mono text-gray-800 break-all mb-6 flex justify-between items-center">
+                <span id="server-ip-display">19.ip.gl.ply.gg:53605</span>
+                <button id="copy-ip-btn" class="ml-4 p-2 rounded-full bg-green-500 text-white hover:bg-green-600 transition-colors duration-200" title="Sao chép IP">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                </button>
+            </div>
+            <p id="copy-message" class="text-green-600 text-sm opacity-0 transition-opacity duration-300">Đã sao chép!</p>
+        </div>
+    </div>
+
+    <script type="module">
+        document.addEventListener('DOMContentLoaded', () => {
+            const copyIpButtonInline = document.getElementById('copy-ip-button-inline'); // For the "Sao chép IP" button in step 3
+            const joinServerModal = document.getElementById('join-server-modal');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const copyIpBtn = document.getElementById('copy-ip-btn'); // For the button inside the modal
+            const serverIpDisplay = document.getElementById('server-ip-display');
+            const copyMessage = document.getElementById('copy-message');
+
+            // Function to open the modal
+            const openModal = () => {
+                if (joinServerModal) {
+                    joinServerModal.classList.add('open');
+                    copyMessage.style.opacity = '0'; // Reset copy message visibility
+                }
+            };
+
+            // Function to close and reset the modal
+            const closeAndResetModal = () => {
+                if (joinServerModal) {
+                    joinServerModal.classList.remove('open');
+                }
+            };
+
+            // Event listener for the "Sao chép IP" button in Step 3
+            if (copyIpButtonInline) {
+                copyIpButtonInline.addEventListener('click', openModal);
+            }
+
+            // Event listener for closing the modal via the 'X' button
+            if (closeModalBtn) {
+                closeModalBtn.addEventListener('click', closeAndResetModal);
+            }
+
+            // Event listener for closing the modal by clicking outside its content
+            if (joinServerModal) {
+                joinServerModal.addEventListener('click', (e) => {
+                    if (e.target === joinServerModal) { // Check if click target is the overlay itself
+                        closeAndResetModal();
+                    }
+                });
+            }
+
+            // Event listener for copying IP to clipboard (inside the modal)
+            if (copyIpBtn) {
+                copyIpBtn.addEventListener('click', () => {
+                    const ipAddress = serverIpDisplay.textContent;
+                    const textarea = document.createElement('textarea');
+                    textarea.value = ipAddress;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy'); // Use execCommand for broader compatibility in iframes
+                    document.body.removeChild(textarea);
+
+                    // Show "Đã sao chép!" message
+                    if (copyMessage) {
+                        copyMessage.style.opacity = '1';
+                        setTimeout(() => {
+                            copyMessage.style.opacity = '0';
+                        }, 2000); // Hide after 2 seconds
+                    }
+                });
+            }
+
+            // Intersection Observer for scroll-triggered animations (animate elements as they come into view)
+            const animateOnScrollElements = document.querySelectorAll('.scroll-animate');
+
+            const observerOptions = {
+                root: null, // Use the viewport as the root
+                rootMargin: '0px',
+                threshold: 0.2 // Trigger when 20% of the element is visible
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target); // Stop observing once animated to prevent re-animation
+                    }
+                    // Else, if it's not intersecting and already visible, you might want to remove 'is-visible'
+                    // For a fade-in-once effect, you generally don't remove it.
+                });
+            }, observerOptions);
+
+            // Observe each element with the 'scroll-animate' class
+            animateOnScrollElements.forEach(element => {
+                observer.observe(element);
+            });
+        });
+    </script>
+</body>
+</html>
