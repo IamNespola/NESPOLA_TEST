@@ -57,6 +57,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js"; 
         import { getAuth, onAuthStateChanged, signOut, updateProfile, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js"; 
         import { getFirestore } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js"; 
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-storage.js"; // Import Firebase Storage
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
 
         // Cấu hình Firebase của bạn (đảm bảo 'apiKey' chính xác)
@@ -64,7 +65,7 @@
             apiKey: "AIzaSyB2S9V-EhHHsCQ_rxEUgA5DXfeZkFwOijY", // <-- API Key CHÍNH XÁC của bạn
             authDomain: "nespola-294d7.firebaseapp.com",
             projectId: "nespola-294d7",
-            storageBucket: "nespola-294d7.firebasestorage.app",
+            storageBucket: "nespola-294d7.appspot.com", // Đảm bảo đây là bucket của bạn
             messagingSenderId: "893545252364",
             appId: "1:893545252364:web:3dd780e52ef2a0b5795029",
             measurementId: "G-2GLRRM71RV" 
@@ -75,6 +76,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const storage = getStorage(app); // Khởi tạo Firebase Storage
         const analytics = getAnalytics(app);
 
         // Đăng nhập ẩn danh hoặc bằng custom token cho môi trường Canvas
@@ -93,9 +95,13 @@
         window.firebaseApp = app;
         window.firebaseAuth = auth;
         window.firebaseDb = db;
+        window.firebaseStorage = storage; // Export storage instance
         window.onAuthStateChanged = onAuthStateChanged;
         window.signOut = signOut;
         window.updateProfile = updateProfile;
+        window.ref = ref; // Export ref function
+        window.uploadBytes = uploadBytes; // Export uploadBytes function
+        window.getDownloadURL = getDownloadURL; // Export getDownloadURL function
     </script>
 </head>
 <body class="min-h-screen bg-white text-gray-800 antialiased">
@@ -136,9 +142,10 @@
 
             <div class="flex flex-col items-center mb-6">
                 <div class="relative w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-5xl overflow-hidden mb-4">
-                    <i class="fas fa-user-circle"></i>
+                    <i class="fas fa-user-circle" id="default-user-icon"></i>
                     <!-- Placeholder for actual user photo -->
                     <img id="user-photo" src="" alt="Ảnh đại diện" class="absolute inset-0 w-full h-full object-cover hidden">
+                    <!-- Input type file để chọn ảnh -->
                     <input type="file" id="photo-upload" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                 </div>
                 <p id="current-email" class="text-lg font-semibold text-gray-800 mb-2"></p>
@@ -180,12 +187,18 @@
         document.addEventListener('DOMContentLoaded', () => {
             const auth = window.firebaseAuth;
             const onAuthStateChanged = window.onAuthStateChanged;
-            const updateProfile = window.updateProfile; // Import updateProfile function
+            const updateProfile = window.updateProfile;
+            const storage = window.firebaseStorage; // Get storage instance
+            const ref = window.ref; // Get ref function
+            const uploadBytes = window.uploadBytes; // Get uploadBytes function
+            const getDownloadURL = window.getDownloadURL; // Get getDownloadURL function
+
             const messageBox = document.getElementById('message-box');
             const currentEmailSpan = document.getElementById('current-email');
             const displayNameInput = document.getElementById('display-name');
             const profileForm = document.getElementById('profile-form');
             const userPhotoImg = document.getElementById('user-photo');
+            const defaultUserIcon = document.getElementById('default-user-icon');
             const photoUploadInput = document.getElementById('photo-upload');
             const changePhotoBtn = document.getElementById('change-photo-btn');
 
@@ -199,31 +212,33 @@
                 }
                 setTimeout(() => {
                     messageBox.classList.remove('show');
-                    // messageBox.classList.add('hidden'); // Ẩn hoàn toàn sau animation
                 }, 3000); // Ẩn sau 3 giây
+            };
+
+            // Cập nhật ảnh đại diện trên UI
+            const updateUserPhoto = (photoURL) => {
+                if (photoURL) {
+                    userPhotoImg.src = photoURL;
+                    userPhotoImg.classList.remove('hidden');
+                    defaultUserIcon.classList.add('hidden'); // Ẩn icon mặc định
+                } else {
+                    userPhotoImg.classList.add('hidden');
+                    userPhotoImg.src = ''; // Xóa src nếu không có ảnh
+                    defaultUserIcon.classList.remove('hidden'); // Hiển thị icon mặc định
+                }
             };
 
             // Lắng nghe trạng thái đăng nhập
             if (auth && onAuthStateChanged) {
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
-                        // Người dùng đã đăng nhập, hiển thị thông tin
                         currentEmailSpan.textContent = user.email || '';
                         displayNameInput.value = user.displayName || '';
-                        if (user.photoURL) {
-                            userPhotoImg.src = user.photoURL;
-                            userPhotoImg.classList.remove('hidden');
-                        } else {
-                            userPhotoImg.classList.add('hidden'); // Ẩn nếu không có ảnh
-                        }
+                        updateUserPhoto(user.photoURL); // Cập nhật ảnh khi user load
                     } else {
-                        // Người dùng chưa đăng nhập, chuyển hướng về trang login
                         showMessage("Bạn cần đăng nhập để truy cập trang này.", true);
                         setTimeout(() => {
-                            // Xây dựng đường dẫn tuyệt đối dựa trên vị trí hiện tại
-                            const currentPath = window.location.pathname;
-                            const currentDirectory = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
-                            window.location.replace(currentDirectory + 'login.html'); // Đã sửa đường dẫn và dùng replace
+                            window.location.replace(window.location.origin + '/login.html'); 
                         }, 2000);
                     }
                 });
@@ -232,7 +247,7 @@
                 showMessage("Lỗi hệ thống: Không thể tải dịch vụ xác thực.", true);
             }
 
-            // Xử lý cập nhật hồ sơ
+            // Xử lý cập nhật hồ sơ (Tên hiển thị)
             if (profileForm && updateProfile) {
                 profileForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
@@ -243,7 +258,7 @@
                             await updateProfile(user, {
                                 displayName: newDisplayName
                             });
-                            showMessage("Cập nhật hồ sơ thành công!");
+                            showMessage("Cập nhật tên hiển thị thành công!");
                         } catch (error) {
                             console.error("Lỗi cập nhật hồ sơ:", error);
                             showMessage("Lỗi cập nhật hồ sơ: " + error.message, true);
@@ -254,27 +269,54 @@
                 });
             }
 
-            // Xử lý thay đổi ảnh đại diện (chỉ là placeholder logic vì Firebase Auth không hỗ trợ upload trực tiếp)
-            if (changePhotoBtn && photoUploadInput) {
+            // Xử lý thay đổi ảnh đại diện
+            if (changePhotoBtn && photoUploadInput && storage && ref && uploadBytes && getDownloadURL) {
                 changePhotoBtn.addEventListener('click', () => {
                     photoUploadInput.click(); // Kích hoạt input file
                 });
 
-                photoUploadInput.addEventListener('change', (e) => {
+                photoUploadInput.addEventListener('change', async (e) => {
                     const file = e.target.files[0];
-                    if (file) {
-                        // Đây chỉ là demo hiển thị ảnh cục bộ
-                        // Trong thực tế, bạn cần upload ảnh này lên Firebase Storage
-                        // và sau đó cập nhật photoURL của user bằng URL từ Firebase Storage.
-                        const reader = new FileReader();
-                        reader.onload = (event) => {
-                            userPhotoImg.src = event.target.result;
-                            userPhotoImg.classList.remove('hidden');
-                            showMessage("Ảnh đã được chọn. Để lưu ảnh, bạn cần triển khai chức năng upload lên Firebase Storage và cập nhật hồ sơ.", false);
-                        };
-                        reader.readAsDataURL(file);
+                    const user = auth.currentUser;
+
+                    if (!file) {
+                        showMessage("Vui lòng chọn một tệp ảnh.", true);
+                        return;
+                    }
+                    if (!user) {
+                        showMessage("Bạn cần đăng nhập để tải ảnh lên.", true);
+                        return;
+                    }
+
+                    showMessage("Đang tải ảnh lên...", false);
+
+                    try {
+                        // Tạo đường dẫn trong Firebase Storage
+                        // Đặt tên file là userId để dễ quản lý, ví dụ: 'profile_pictures/userId/profile.jpg'
+                        const storageRef = ref(storage, `profile_pictures/${user.uid}/${file.name}`);
+                        
+                        // Tải file lên
+                        const uploadTask = await uploadBytes(storageRef, file);
+                        
+                        // Lấy URL tải xuống của ảnh
+                        const photoURL = await getDownloadURL(uploadTask.ref);
+
+                        // Cập nhật photoURL trong hồ sơ người dùng
+                        await updateProfile(user, {
+                            photoURL: photoURL
+                        });
+
+                        updateUserPhoto(photoURL); // Cập nhật ảnh trên UI
+                        showMessage("Cập nhật ảnh đại diện thành công!");
+
+                    } catch (error) {
+                        console.error("Lỗi khi tải ảnh lên hoặc cập nhật hồ sơ:", error);
+                        showMessage("Lỗi: " + error.message, true);
                     }
                 });
+            } else {
+                 console.error("Firebase Storage SDK hoặc các hàm liên quan chưa được khởi tạo đầy đủ.");
+                 showMessage("Lỗi hệ thống: Không thể tải dịch vụ lưu trữ.", true);
             }
         });
     </script>
