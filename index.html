@@ -109,39 +109,39 @@
             transform: translateY(0);
             opacity: 1;
         }
-        /* Style for logged-in user display */
+        /* Style for logged-in user display - Removed as it's not used now */
+        /*
         .user-display {
             display: flex;
             align-items: center;
-            gap: 0.5rem; /* Tailwind 'gap-2' */
-            font-weight: 600; /* Tailwind 'font-semibold' */
-            color: #4A5568; /* Tailwind 'text-gray-700' */
+            gap: 0.5rem;
+            font-weight: 600;
+            color: #4A5568;
         }
         .user-display button {
-            margin-left: 0.5rem; /* Tailwind 'ml-2' */
-            padding: 0.5rem 1rem; /* Tailwind 'px-4 py-2' */
-            background-color: #EF4444; /* Tailwind 'bg-red-500' */
-            color: #FFFFFF; /* Tailwind 'text-white' */
-            border-radius: 0.5rem; /* Tailwind 'rounded-lg' */
-            font-weight: 500; /* Tailwind 'font-medium' */
+            margin-left: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: #EF4444;
+            color: #FFFFFF;
+            border-radius: 0.5rem;
+            font-weight: 500;
             transition: background-color 0.2s ease-in-out;
         }
         .user-display button:hover {
-            background-color: #DC2626; /* Tailwind 'hover:bg-red-600' */
+            background-color: #DC2626;
         }
+        */
     </style>
-    <!-- Firebase SDKs -->
+    <!-- Firebase SDKs - Removed as it's not used now -->
+    <!--
     <script type="module">
-        // Import các hàm bạn cần từ SDKs bạn muốn sử dụng
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js"; 
         import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js"; 
         import { getFirestore } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js"; 
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
 
-        // Cấu hình Firebase của bạn (lấy từ Firebase Console của dự án nespola-294d7)
-        // Đảm bảo 'apiKey' ở đây CHÍNH XÁC với API Key từ Firebase Console của bạn.
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "AIzaSyB2S9V-EhHHsCQ_rxEUgA5DXfeZkFwOijY", // <-- API Key CHÍNH XÁC của bạn
+            apiKey: "AIzaSyB2S9V-EhHHsCQ_rxEUgA5DXfeZkFwOijY",
             authDomain: "nespola-294d7.firebaseapp.com",
             projectId: "nespola-294d7",
             storageBucket: "nespola-294d7.firebasestorage.app",
@@ -151,17 +151,15 @@
         };
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
-        // Khởi tạo Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const analytics = getAnalytics(app);
 
-        // Đăng nhập ẩn danh hoặc bằng custom token cho môi trường Canvas
         if (typeof __initial_auth_token !== 'undefined') {
             signInWithCustomToken(auth, __initial_auth_token).catch((error) => {
                 console.error("Lỗi khi đăng nhập bằng custom token:", error);
-                signInAnonymously(auth); // Fallback đăng nhập ẩn danh nếu token thất bại
+                signInAnonymously(auth);
             });
         } else {
             signInAnonymously(auth).catch((error) => {
@@ -169,13 +167,13 @@
             });
         }
 
-        // Xuất các instance và hàm Firebase ra đối tượng window để dễ dàng truy cập trong script
         window.firebaseApp = app;
         window.firebaseAuth = auth;
         window.firebaseDb = db;
-        window.signOut = signOut; // Xuất hàm signOut
-        window.onAuthStateChanged = onAuthStateChanged; // Xuất hàm onAuthStateChanged
+        window.signOut = signOut;
+        window.onAuthStateChanged = onAuthStateChanged;
     </script>
+    -->
 </head>
 <body class="min-h-screen bg-white text-gray-800 antialiased">
     <div class="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100 z-0 pointer-events-none"></div>
@@ -193,22 +191,14 @@
             <div class="flex items-center space-x-4">
                 <span class="text-gray-600 font-semibold text-sm">v1.8</span>
                 
-                <div id="auth-status-container" class="flex items-center space-x-4">
-                    <a
-                        href="login.html"
-                        id="login-button"
-                        class="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition-colors duration-200"
-                    >
-                        <i class="fas fa-user mr-2"></i> Đăng nhập
-                    </a>
-                    <div id="user-info-display" class="hidden user-display">
-                        <i class="fas fa-user-circle text-xl text-gray-600"></i>
-                        <a href="userinfo.html" id="user-email-link" class="text-gray-700 font-semibold cursor-pointer hover:underline"></a> {/* Updated to a link */}
-                        <button id="logout-button" class="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors duration-200 text-sm">
-                            Đăng xuất
-                        </button>
-                    </div>
-                </div>
+                <!-- Reverted to original login button structure -->
+                <a
+                    href="login.html"
+                    id="login-button"
+                    class="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition-colors duration-200"
+                >
+                    <i class="fas fa-user mr-2"></i> Đăng nhập
+                </a>
             </div>
 
             <div class="md:hidden">
@@ -453,16 +443,18 @@
 
     <script type="module">
         document.addEventListener('DOMContentLoaded', () => {
-            const loginButton = document.getElementById('login-button');
-            const userInfoDisplay = document.getElementById('user-info-display');
-            const userEmailLink = document.getElementById('user-email-link'); // Đã đổi tên từ userEmailSpan
-            const logoutButton = document.getElementById('logout-button');
+            // Reverted login/logout related elements as they are not used with Firebase removed
+            // const loginButton = document.getElementById('login-button');
+            // const userInfoDisplay = document.getElementById('user-info-display');
+            // const userEmailLink = document.getElementById('user-email-link');
+            // const logoutButton = document.getElementById('logout-button');
 
             const joinServerBtn = document.getElementById('join-server-btn');
             const joinServerModal = document.getElementById('join-server-modal');
             const closeModalBtn = document.getElementById('close-modal-btn');
 
-            // --- Logic xử lý trạng thái đăng nhập ---
+            // --- Logic xử lý trạng thái đăng nhập - Removed Firebase related logic ---
+            /*
             const auth = window.firebaseAuth;
             const onAuthStateChanged = window.onAuthStateChanged;
             const signOut = window.signOut;
@@ -470,38 +462,30 @@
             if (auth && onAuthStateChanged) {
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
-                        // Người dùng đã đăng nhập
-                        loginButton.classList.add('hidden'); // Ẩn nút Đăng nhập
-                        userInfoDisplay.classList.remove('hidden'); // Hiển thị thông tin người dùng
-                        // user.displayName sẽ được ưu tiên, nếu không có thì dùng email
+                        loginButton.classList.add('hidden');
+                        userInfoDisplay.classList.remove('hidden');
                         userEmailLink.textContent = user.displayName || user.email || 'Người dùng'; 
-                        userEmailLink.href = 'userinfo.html'; // Liên kết đến trang userinfo
+                        userEmailLink.href = 'userinfo.html';
                     } else {
-                        // Người dùng chưa đăng nhập
-                        loginButton.classList.remove('hidden'); // Hiển thị nút Đăng nhập
-                        userInfoDisplay.classList.add('hidden'); // Ẩn thông tin người dùng
+                        loginButton.classList.remove('hidden');
+                        userInfoDisplay.classList.add('hidden');
                     }
                 });
 
-                // Xử lý sự kiện đăng xuất
                 if (logoutButton) {
                     logoutButton.addEventListener('click', async () => {
                         try {
                             await signOut(auth);
                             console.log("Đăng xuất thành công!");
-                            // UI sẽ được onAuthStateChanged tự động cập nhật
-                            // Có thể thêm chuyển hướng về trang chủ nếu muốn:
-                            // window.location.href = 'index.html';
                         } catch (error) {
                             console.error("Lỗi khi đăng xuất:", error);
-                            // Sử dụng modal hoặc div hiển thị thông báo thay vì alert()
-                            // alert("Có lỗi khi đăng xuất. Vui lòng thử lại."); 
                         }
                     });
                 }
             } else {
                 console.error("Firebase Auth hoặc onAuthStateChanged chưa được khởi tạo. Đảm bảo bạn đã import đúng.");
             }
+            */
             // --- Kết thúc logic xử lý trạng thái đăng nhập ---
 
 
