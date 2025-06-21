@@ -71,16 +71,18 @@
     </style>
     <!-- Firebase SDKs -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
+        // Import các hàm bạn cần từ SDKs bạn muốn sử dụng
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js"; 
+        import { getAuth, createUserWithEmailAndPassword, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js"; 
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js"; 
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
 
-        // Cấu hình Firebase của bạn (lấy từ Firebase Console của dự án nespola-294d7)
-        // LƯU Ý QUAN TRỌNG: Hãy đảm bảo 'apiKey' ở đây CHÍNH XÁC với API Key từ Firebase Console của bạn.
-        // Lỗi 'auth/api-key-not-valid' thường xảy ra nếu API Key sai.
-        // MeasurementId là tùy chọn, nếu bạn không sử dụng Firebase Analytics, bạn có thể xóa nó.
+        // Cấu hình Firebase của bạn
+        // >>>>> VUI LÒNG DÁN TOÀN BỘ ĐOẠN 'const firebaseConfig = { ... };'
+        // >>>>> MÀ BẠN SAO CHÉP TỪ FIREBASE CONSOLE VÀO ĐÂY.
+        // >>>>> Đảm bảo rằng tất cả các trường (apiKey, authDomain, projectId, v.v.) đều chính xác.
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "AIzaSyB2S9V-EhHHsCQ_rxEUgA5DXfeZkFwOijY", // <-- Dán API Key CHÍNH XÁC của bạn vào đây
+            apiKey: "AIzaSyB2S9V-EhHHsCQ_rxEUgA5DXfeZkFw0ijY", // <-- Vui lòng dán API Key CHÍNH XÁC của bạn vào đây
             authDomain: "nespola-294d7.firebaseapp.com",
             projectId: "nespola-294d7",
             storageBucket: "nespola-294d7.firebasestorage.app",
@@ -94,6 +96,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const analytics = getAnalytics(app);
 
         // Đăng nhập ẩn danh hoặc bằng custom token cho môi trường Canvas
         if (typeof __initial_auth_token !== 'undefined') {
@@ -107,7 +110,7 @@
             });
         }
 
-        // Xuất các instance và hàm Firebase ra đối tượng window để dễ dàng truy cập
+        // Xuất các instance và hàm Firebase ra đối tượng window để dễ dàng truy cập trong script
         window.firebaseApp = app;
         window.firebaseAuth = auth;
         window.firebaseDb = db;
@@ -222,4 +225,102 @@
     <script type="module">
         document.addEventListener('DOMContentLoaded', () => {
             const registerForm = document.getElementById('register-form');
-            co
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirm-password');
+            const messageBox = document.getElementById('message-box');
+
+            const joinServerModal = document.getElementById('join-server-modal');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+
+            // Hàm hiển thị thông báo
+            const showMessage = (message, isError = false) => {
+                messageBox.textContent = message;
+                messageBox.classList.remove('hidden', 'error');
+                messageBox.classList.add('show');
+                if (isError) {
+                    messageBox.classList.add('error');
+                }
+                setTimeout(() => {
+                    messageBox.classList.remove('show');
+                    // messageBox.classList.add('hidden'); // Ẩn hoàn toàn sau animation
+                }, 3000); // Ẩn sau 3 giây
+            };
+
+            // Xử lý khi form đăng ký được gửi
+            if (registerForm) {
+                registerForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const email = emailInput.value;
+                    const password = passwordInput.value;
+                    const confirmPassword = confirmPasswordInput.value;
+
+                    if (password !== confirmPassword) {
+                        showMessage("Mật khẩu xác nhận không khớp!", true);
+                        return;
+                    }
+
+                    try {
+                        // Sử dụng các đối tượng Firebase đã được export ra window
+                        const authInstance = window.firebaseAuth;
+                        const createUserFn = window.createUserWithEmailAndPassword;
+
+                        if (!authInstance || !createUserFn) {
+                            console.error("Firebase Auth hoặc hàm createUserWithEmailAndPassword chưa được khởi tạo. Vui lòng kiểm tra lại cấu hình Firebase và đảm bảo đã bật phương thức đăng nhập Email/Password trong Firebase Console.");
+                            showMessage("Lỗi hệ thống: Không thể kết nối đến dịch vụ đăng ký. Vui lòng thử lại sau.", true);
+                            return;
+                        }
+
+                        const userCredential = await createUserFn(authInstance, email, password);
+                        console.log("Đăng ký thành công:", userCredential.user);
+                        showMessage("Đăng ký thành công! Đang chuyển hướng đến trang Đăng nhập...", false);
+                        
+                        // Chuyển hướng đến trang đăng nhập sau khi đăng ký thành công
+                        setTimeout(() => {
+                            window.location.href = 'login.html';
+                        }, 1500); // Chuyển hướng sau 1.5 giây
+                    } catch (error) {
+                        console.error("Lỗi đăng ký:", error.code, error.message);
+                        let errorMessage = "Đăng ký thất bại. Vui lòng thử lại.";
+                        if (error.code === 'auth/email-already-in-use') {
+                            errorMessage = "Email này đã được sử dụng. Vui lòng sử dụng email khác.";
+                        } else if (error.code === 'auth/invalid-email') {
+                            errorMessage = "Email không hợp lệ.";
+                        } else if (error.code === 'auth/weak-password') {
+                            errorMessage = "Mật khẩu quá yếu (ít nhất 6 ký tự).";
+                        } else if (error.code === 'auth/network-request-failed') {
+                            errorMessage = "Lỗi mạng: Vui lòng kiểm tra kết nối internet của bạn.";
+                        } else if (error.code === 'auth/operation-not-allowed') {
+                            errorMessage = "Đăng ký bằng Email/Mật khẩu chưa được bật. Vui lòng bật nó trong Firebase Console > Authentication > Sign-in method.";
+                        } else if (error.code === 'auth/internal-error' || error.code === 'auth/invalid-api-key') {
+                            errorMessage = "Lỗi cấu hình Firebase: API Key không hợp lệ. Vui lòng kiểm tra lại API Key và Project ID của bạn trong Firebase Console.";
+                        }
+                        showMessage(errorMessage, true);
+                    }
+                });
+            }
+
+            // Hàm đóng và reset modal (dành cho modal "Server chưa phát hành!")
+            const closeAndResetModal = () => {
+                if (joinServerModal) {
+                    joinServerModal.classList.remove('open');
+                }
+            };
+
+            // Lắng nghe sự kiện click cho nút đóng modal 'X'
+            if (closeModalBtn) {
+                closeModalBtn.addEventListener('click', closeAndResetModal);
+            }
+
+            // Lắng nghe sự kiện click bên ngoài modal để đóng
+            if (joinServerModal) {
+                joinServerModal.addEventListener('click', (e) => {
+                    if (e.target === joinServerModal) {
+                        closeAndResetModal();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
