@@ -75,8 +75,16 @@
         import { getAuth, signInWithEmailAndPassword, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase configuration from environment variables
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        // Firebase configuration (lấy từ Firebase Console của bạn)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyB2S9V-EhHHsCQ_rxEUgA5DXfeZkFw0ijY",
+            authDomain: "nespola-294d7.firebaseapp.com",
+            projectId: "nespola-294d7",
+            storageBucket: "nespola-294d7.firebasestorage.app",
+            messagingSenderId: "893545252364",
+            appId: "1:893545252364:web:3dd780e52ef2a0b5795029",
+            measurementId: "G-2GLRRM71RV"
+        };
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
         // Initialize Firebase
@@ -111,6 +119,7 @@
     <header class="relative z-10 bg-white shadow-sm">
         <nav class="container mx-auto px-4 py-4 flex items-center justify-between">
             <div class="flex items-center space-x-2">
+                <!-- Logo của server -->
                 <img src="./logo.png" alt="NESPOLA Server Logo" class="h-10 md:h-12 object-contain">
             </div>
             <div class="flex items-center space-x-4">
@@ -234,46 +243,53 @@
                     const password = passwordInput.value;
 
                     try {
-                        // Using the imported signInWithEmailAndPassword from global scope
                         const authInstance = window.firebaseAuth;
-                        const signInWithEmailAndPassword = window.signInWithEmailAndPassword;
+                        const signInFn = window.signInWithEmailAndPassword;
 
-                        const userCredential = await signInWithEmailAndPassword(authInstance, email, password);
+                        if (!authInstance || !signInFn) {
+                            console.error("Firebase Auth or signInWithEmailAndPassword not initialized. Check your Firebase config and enable Email/Password sign-in method in Firebase Console.");
+                            showMessage("Lỗi hệ thống: Không thể kết nối đến dịch vụ đăng nhập. Vui lòng thử lại sau.", true);
+                            return;
+                        }
+
+                        const userCredential = await signInFn(authInstance, email, password);
                         console.log("Đăng nhập thành công:", userCredential.user);
                         showMessage("Đăng nhập thành công! Đang chuyển hướng đến trang chủ...", false);
                         
-                        // Redirect to index page after successful login
                         setTimeout(() => {
                             window.location.href = 'index.html';
-                        }, 1500); // Redirect after 1.5 seconds
+                        }, 1500); 
                     } catch (error) {
                         console.error("Lỗi đăng nhập:", error.code, error.message);
                         let errorMessage = "Đăng nhập thất bại. Vui lòng thử lại.";
-                        if (error.code === 'auth/invalid-credential') { // Catch all for wrong email/password combination
+                        if (error.code === 'auth/invalid-credential') { 
                             errorMessage = "Email hoặc mật khẩu không đúng.";
                         } else if (error.code === 'auth/user-disabled') {
                             errorMessage = "Tài khoản của bạn đã bị vô hiệu hóa.";
                         } else if (error.code === 'auth/invalid-email') {
                             errorMessage = "Email không hợp lệ.";
+                        } else if (error.code === 'auth/network-request-failed') {
+                            errorMessage = "Lỗi mạng: Vui lòng kiểm tra kết nối internet của bạn.";
+                        } else if (error.code === 'auth/operation-not-allowed') {
+                            errorMessage = "Đăng nhập bằng Email/Mật khẩu chưa được bật. Vui lòng bật nó trong Firebase Console > Authentication > Sign-in method.";
+                        } else if (error.code === 'auth/internal-error' || error.code === 'auth/invalid-api-key') {
+                            errorMessage = "Lỗi cấu hình Firebase. Vui lòng kiểm tra API Key và Project ID của bạn.";
                         }
                         showMessage(errorMessage, true);
                     }
                 });
             }
 
-            // Function to close and reset the modal (for "Server chưa phát hành!" modal)
             const closeAndResetModal = () => {
                 if (joinServerModal) {
                     joinServerModal.classList.remove('open');
                 }
             };
 
-            // Event listener for closing the modal via the 'X' button
             if (closeModalBtn) {
                 closeModalBtn.addEventListener('click', closeAndResetModal);
             }
 
-            // Event listener for closing the modal by clicking outside its content
             if (joinServerModal) {
                 joinServerModal.addEventListener('click', (e) => {
                     if (e.target === joinServerModal) {
