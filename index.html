@@ -130,8 +130,7 @@
             background-color: #DC2626; /* Tailwind 'hover:bg-red-600' */
         }
     </style>
-    <!-- Firebase SDKs - Removed as it's not used now -->
-    <!--
+    <!-- Firebase SDKs - Re-enabled Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js"; 
         import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js"; 
@@ -142,7 +141,7 @@
             apiKey: "AIzaSyB2S9V-EhHHsCQ_rxEUgA5DXfeZkFwOijY",
             authDomain: "nespola-294d7.firebaseapp.com",
             projectId: "nespola-294d7",
-            storageBucket: "nespola-294d7.firebasestorage.app",
+            storageBucket: "nespola-294d7.appspot.com", // Updated to appspot.com for consistency with userinfo.html
             messagingSenderId: "893545252364",
             appId: "1:893545252364:web:3dd780e52ef2a0b5795029",
             measurementId: "G-2GLRRM71RV" 
@@ -171,7 +170,6 @@
         window.signOut = signOut;
         window.onAuthStateChanged = onAuthStateChanged;
     </script>
-    -->
 </head>
 <body class="min-h-screen bg-white text-gray-800 antialiased">
     <div class="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100 z-0 pointer-events-none"></div>
@@ -189,7 +187,7 @@
             <div class="flex items-center space-x-4">
                 <span class="text-gray-600 font-semibold text-sm">v2.0</span>
                 
-                <!-- Reverted to original login button structure -->
+                <!-- Login/Logout and User Info Display -->
                 <a
                     href="login.html"
                     id="login-button"
@@ -197,6 +195,11 @@
                 >
                     <i class="fas fa-user mr-2"></i> Đăng nhập
                 </a>
+
+                <div id="user-info-display" class="hidden user-display">
+                    <a href="userinfo.html" id="user-email-link" class="text-gray-700 hover:text-green-600 font-semibold text-sm"></a>
+                    <button id="logout-button">Đăng xuất</button>
+                </div>
             </div>
 
             <div class="md:hidden">
@@ -328,7 +331,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animated-section scale-in-on-scroll">
                 <div class="p-6 bg-white rounded-lg shadow-md flex items-start space-x-4 card-effect group">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 mt-1"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76a6 6 0 0 0-8.49 0"/><path d="M11.66 16.34a2 2 0 0 0 2.83 0"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 mt-1"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76a6 6 0 = 0 0-8.49 0"/><path d="M11.66 16.34a2 2 0 0 0 2.83 0"/></svg>
                     <div>
                         <h3 class="text-xl font-semibold text-gray-900 mb-2">Khám phá chiến trường</h3>
                         <p class="text-gray-600">Khám phá đa dạng các bản đồ Bedwars với địa hình và chiến thuật độc đáo, không ngừng đổi mới.</p>
@@ -441,18 +444,16 @@
 
     <script type="module">
         document.addEventListener('DOMContentLoaded', () => {
-            // Reverted login/logout related elements as they are not used with Firebase removed
-            // const loginButton = document.getElementById('login-button');
-            // const userInfoDisplay = document.getElementById('user-info-display');
-            // const userEmailLink = document.getElementById('user-email-link');
-            // const logoutButton = document.getElementById('logout-button');
+            const loginButton = document.getElementById('login-button');
+            const userInfoDisplay = document.getElementById('user-info-display');
+            const userEmailLink = document.getElementById('user-email-link');
+            const logoutButton = document.getElementById('logout-button');
 
             const joinServerBtn = document.getElementById('join-server-btn');
             const joinServerModal = document.getElementById('join-server-modal');
             const closeModalBtn = document.getElementById('close-modal-btn');
 
-            // --- Logic xử lý trạng thái đăng nhập - Removed Firebase related logic ---
-            /*
+            // --- Logic xử lý trạng thái đăng nhập - Re-enabled Firebase related logic ---
             const auth = window.firebaseAuth;
             const onAuthStateChanged = window.onAuthStateChanged;
             const signOut = window.signOut;
@@ -463,7 +464,7 @@
                         loginButton.classList.add('hidden');
                         userInfoDisplay.classList.remove('hidden');
                         userEmailLink.textContent = user.displayName || user.email || 'Người dùng'; 
-                        userEmailLink.href = 'userinfo.html';
+                        userEmailLink.href = 'userinfo.html'; // Link to userinfo.html
                     } else {
                         loginButton.classList.remove('hidden');
                         userInfoDisplay.classList.add('hidden');
@@ -483,7 +484,6 @@
             } else {
                 console.error("Firebase Auth hoặc onAuthStateChanged chưa được khởi tạo. Đảm bảo bạn đã import đúng.");
             }
-            */
             // --- Kết thúc logic xử lý trạng thái đăng nhập ---
 
 
