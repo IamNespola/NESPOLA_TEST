@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập tài khoản - Server Nespola</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-400 { animation-delay: 0.4s; }
+
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.7);
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.open {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-content {
+            transform: translateY(20px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .modal-overlay.open .modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        ::selection {
+            background-color: #34D399;
+            color: #ffffff;
+        }
+        ::-moz-selection {
+            background-color: #34D399;
+            color: #ffffff;
+        }
+        .message-box {
+            background-color: #f0fdf4; /* green-50 */
+            color: #16a34a; /* green-700 */
+            border: 1px solid #dcfce7; /* green-100 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .message-box.error {
+            background-color: #fef2f2; /* red-50 */
+            color: #dc2626; /* red-700 */
+            border-color: #fee2e2; /* red-100 */
+        }
+        .message-box.show {
+            opacity: 1;
+        }
+    </style>
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase configuration from environment variables
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Sign in anonymously or with custom token for Canvas environment
+        if (typeof __initial_auth_token !== 'undefined') {
+            signInWithCustomToken(auth, __initial_auth_token).catch((error) => {
+                console.error("Error signing in with custom token:", error);
+                signInAnonymously(auth); // Fallback to anonymous sign-in if token fails
+            });
+        } else {
+            signInAnonymously(auth).catch((error) => {
+                console.error("Error signing in anonymously:", error);
+            });
+        }
+
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.firebaseDb = db;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword; // Expose to global scope
+    </script>
+</head>
+<body class="min-h-screen bg-white text-gray-800 antialiased">
+    <div class="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100 z-0 pointer-events-none"></div>
+    <div class="absolute inset-0 z-0 pointer-events-none" style="
+        background-image: url(&quot;data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zm0 20v-4H4v4H0v2h4v4h2v-4h4v-2H6zM36 4V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 4V0H4v4H0v2h4v4h2V6h4V4H6zM21 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM21 0v-4h-2v4h-4v2h4v4h2V6h4V4h-4zM41 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM41 0v-4h-2v4h-4v2h4v4h2V6h4V4h-4zM11 9v-4h-2v4H5v2h4v4h2v-4h4V9h-4zm0 20v-4h-2v4H5v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4H5v2h4v4h2v-4h4v-2h-4zm30-30v-4h-2v4h-4v2h4v4h2v-4h4V9h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E&quot;);
+        background-size: 100px 100px;"></div>
+
+    <header class="relative z-10 bg-white shadow-sm">
+        <nav class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <img src="./logo.png" alt="NESPOLA Server Logo" class="h-10 md:h-12 object-contain">
+            </div>
+            <div class="flex items-center space-x-4">
+                <span class="text-gray-600 font-semibold text-sm">v1.0</span>
+            </div>
+            <div class="md:hidden">
+                <button class="p-2 text-gray-600 hover:text-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 rounded-md">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-6rem)] px-4 py-16 md:py-24">
+        <div class="bg-white p-8 md:p-12 rounded-lg shadow-xl w-full max-w-md animate-fade-in-up">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-4 text-center">
+                Đăng nhập tài khoản <span class="text-green-600">NESPOLA</span>
+            </h1>
+            <p class="text-md text-gray-600 mb-8 text-center">
+                Chào mừng bạn trở lại! Đăng nhập để tiếp tục cuộc phiêu lưu của bạn.
+            </p>
+
+            <div id="message-box" class="message-box hidden" role="alert"></div>
+
+            <form id="login-form" class="space-y-6">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 text-left">Email</label>
+                    <input type="email" id="email" name="email" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm" placeholder="Nhập email của bạn" required>
+                </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 text-left">Mật khẩu</label>
+                    <input type="password" id="password" name="password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm" placeholder="Nhập mật khẩu của bạn" required>
+                </div>
+                <button type="submit" class="w-full flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    Đăng nhập
+                </button>
+            </form>
+
+            <p class="mt-6 text-center text-sm text-gray-600">
+                Chưa có tài khoản?
+                <a href="register.html" class="font-medium text-green-600 hover:text-green-500">
+                    Đăng ký ngay!
+                </a>
+            </p>
+            <p class="mt-4 text-center text-sm text-gray-600">
+                <a href="index.html" class="font-medium text-blue-600 hover:text-blue-500 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1">
+                        <path d="M12 19L5 12l7-7M19 12H5"/>
+                    </svg>
+                    Quay lại Trang chủ
+                </a>
+            </p>
+        </div>
+    </main>
+
+    <footer class="bg-gray-100 py-6 text-center text-gray-600 text-sm">
+        <div class="container mx-auto px-4">
+            <p>&copy; 2025 SERVER HVH BEDWAR NESPOLA. All rights reserved.</p>
+            <p class="mt-1">Cre: Jino</p>
+        </div>
+    </footer>
+
+    <!-- Join Server Modal (Displays error message when server is not released) -->
+    <div id="join-server-modal" class="modal-overlay fixed inset-0 flex items-center justify-center z-50">
+        <div class="modal-content bg-white p-8 rounded-lg shadow-xl relative w-11/12 max-w-sm text-center">
+            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <h3 class="text-2xl font-bold text-red-600 mb-4">Lỗi: Server chưa phát hành!</h3>
+            <p class="text-gray-700 mb-4">
+                SERVER HVH BEDWAR NESPOLA hiện chưa được phát hành.
+            </p>
+            <p class="text-gray-700 mb-6 font-semibold">
+                Vui lòng thử lại sau hoặc theo dõi kênh Discord để nhận thông báo sớm nhất nhé!
+            </p>
+            <a
+                href="https://discord.gg/gYTRrGx8Vv"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105"
+            >
+                <i class="fab fa-discord w-5 h-5 mr-2 text-xl"></i>
+                Tham gia Discord
+            </a>
+        </div>
+    </div>
+
+    <script type="module">
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginForm = document.getElementById('login-form');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const messageBox = document.getElementById('message-box');
+
+            const joinServerModal = document.getElementById('join-server-modal');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+
+            // Function to display messages
+            const showMessage = (message, isError = false) => {
+                messageBox.textContent = message;
+                messageBox.classList.remove('hidden', 'error');
+                messageBox.classList.add('show');
+                if (isError) {
+                    messageBox.classList.add('error');
+                }
+                setTimeout(() => {
+                    messageBox.classList.remove('show');
+                    // messageBox.classList.add('hidden'); // Hide completely after animation
+                }, 3000); // Hide after 3 seconds
+            };
+
+            // Handle login form submission
+            if (loginForm) {
+                loginForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const email = emailInput.value;
+                    const password = passwordInput.value;
+
+                    try {
+                        // Using the imported signInWithEmailAndPassword from global scope
+                        const authInstance = window.firebaseAuth;
+                        const signInWithEmailAndPassword = window.signInWithEmailAndPassword;
+
+                        const userCredential = await signInWithEmailAndPassword(authInstance, email, password);
+                        console.log("Đăng nhập thành công:", userCredential.user);
+                        showMessage("Đăng nhập thành công! Đang chuyển hướng đến trang chủ...", false);
+                        
+                        // Redirect to index page after successful login
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 1500); // Redirect after 1.5 seconds
+                    } catch (error) {
+                        console.error("Lỗi đăng nhập:", error.code, error.message);
+                        let errorMessage = "Đăng nhập thất bại. Vui lòng thử lại.";
+                        if (error.code === 'auth/invalid-credential') { // Catch all for wrong email/password combination
+                            errorMessage = "Email hoặc mật khẩu không đúng.";
+                        } else if (error.code === 'auth/user-disabled') {
+                            errorMessage = "Tài khoản của bạn đã bị vô hiệu hóa.";
+                        } else if (error.code === 'auth/invalid-email') {
+                            errorMessage = "Email không hợp lệ.";
+                        }
+                        showMessage(errorMessage, true);
+                    }
+                });
+            }
+
+            // Function to close and reset the modal (for "Server chưa phát hành!" modal)
+            const closeAndResetModal = () => {
+                if (joinServerModal) {
+                    joinServerModal.classList.remove('open');
+                }
+            };
+
+            // Event listener for closing the modal via the 'X' button
+            if (closeModalBtn) {
+                closeModalBtn.addEventListener('click', closeAndResetModal);
+            }
+
+            // Event listener for closing the modal by clicking outside its content
+            if (joinServerModal) {
+                joinServerModal.addEventListener('click', (e) => {
+                    if (e.target === joinServerModal) {
+                        closeAndResetModal();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
