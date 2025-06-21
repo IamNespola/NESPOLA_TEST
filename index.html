@@ -64,6 +64,7 @@
             background: linear-gradient(90deg, #10B981, #6EE7B7, #10B981); /* Darker Green, Lighter Green, Darker Green */
             background-size: 200% 200%;
             -webkit-background-clip: text;
+            background-clip: text; /* Thêm dòng này cho tương thích tốt hơn */
             -webkit-text-fill-color: transparent;
             animation: gradient-breath 4s ease infinite; /* Thời gian animation dài hơn, mượt mà */
         }
@@ -108,7 +109,6 @@
             transform: translateY(0);
             opacity: 1;
         }
-
         /* Style for logged-in user display */
         .user-display {
             display: flex;
@@ -203,7 +203,7 @@
                     </a>
                     <div id="user-info-display" class="hidden user-display">
                         <i class="fas fa-user-circle text-xl text-gray-600"></i>
-                        <span id="user-email" class="text-gray-700 font-semibold"></span>
+                        <a href="userinfo.html" id="user-email-link" class="text-gray-700 font-semibold cursor-pointer hover:underline"></a> {/* Updated to a link */}
                         <button id="logout-button" class="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors duration-200 text-sm">
                             Đăng xuất
                         </button>
@@ -358,7 +358,7 @@
                     <div>
                         <h3 class="text-xl font-semibold text-gray-900 mb-2">Thăng cấp & Nhận thưởng</h3>
                         <p class="text-gray-600">Đạt thứ hạng cao trên bảng xếp hạng, mở khóa phần thưởng độc quyền và chứng tỏ kỹ năng của bạn.</p>
-                    </div>
+                    </đoạn>
                 </div>
                 <div class="p-6 bg-white rounded-lg shadow-md flex items-start space-x-4 card-effect group">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 mt-1"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
@@ -384,7 +384,7 @@
             </div>
 
             <!-- Tham gia cộng đồng section -->
-            <div class="text-center mt-20 scroll-animate">
+            <div class="text-center mt-20 animated-section slide-in-up-on-scroll">
                 <div class="flex justify-center mb-8">
                     <svg
                       width="64"
@@ -455,7 +455,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const loginButton = document.getElementById('login-button');
             const userInfoDisplay = document.getElementById('user-info-display');
-            const userEmailSpan = document.getElementById('user-email');
+            const userEmailLink = document.getElementById('user-email-link'); // Đã đổi tên từ userEmailSpan
             const logoutButton = document.getElementById('logout-button');
 
             const joinServerBtn = document.getElementById('join-server-btn');
@@ -473,7 +473,9 @@
                         // Người dùng đã đăng nhập
                         loginButton.classList.add('hidden'); // Ẩn nút Đăng nhập
                         userInfoDisplay.classList.remove('hidden'); // Hiển thị thông tin người dùng
-                        userEmailSpan.textContent = user.email || 'Người dùng'; // Hiển thị email hoặc 'Người dùng'
+                        // user.displayName sẽ được ưu tiên, nếu không có thì dùng email
+                        userEmailLink.textContent = user.displayName || user.email || 'Người dùng'; 
+                        userEmailLink.href = 'userinfo.html'; // Liên kết đến trang userinfo
                     } else {
                         // Người dùng chưa đăng nhập
                         loginButton.classList.remove('hidden'); // Hiển thị nút Đăng nhập
@@ -487,10 +489,13 @@
                         try {
                             await signOut(auth);
                             console.log("Đăng xuất thành công!");
-                            // Tự động chuyển hướng hoặc cập nhật UI đã được onAuthStateChanged xử lý
+                            // UI sẽ được onAuthStateChanged tự động cập nhật
+                            // Có thể thêm chuyển hướng về trang chủ nếu muốn:
+                            // window.location.href = 'index.html';
                         } catch (error) {
                             console.error("Lỗi khi đăng xuất:", error);
-                            alert("Có lỗi khi đăng xuất. Vui lòng thử lại.");
+                            // Sử dụng modal hoặc div hiển thị thông báo thay vì alert()
+                            // alert("Có lỗi khi đăng xuất. Vui lòng thử lại."); 
                         }
                     });
                 }
@@ -534,24 +539,29 @@
             }
 
             // Intersection Observer for scroll-triggered animations (animate elements as they come into view)
-            const animateOnScrollElements = document.querySelectorAll('.scroll-animate');
+            const animateOnScrollElements = document.querySelectorAll('.animated-section'); // Đã chỉnh sang animated-section
 
             const observerOptions = {
                 root: null, // Use the viewport as the root
                 rootMargin: '0px',
-                threshold: 0.2 // Trigger when 20% of the element is visible
+                threshold: 0.1 // Trigger when 10% of the element is visible
             };
 
             const observer = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('is-visible');
-                        observer.unobserve(entry.target); // Stop observing once animated to prevent re-animation
+                        // Có thể dừng quan sát sau khi đã nhìn thấy để animation chỉ chạy một lần
+                        // Nếu muốn animation chạy lại mỗi lần cuộn qua, hãy bỏ dòng này
+                        // observer.unobserve(entry.target); 
+                    } else {
+                        // Nếu muốn animation reset khi cuộn ra khỏi viewport
+                        // entry.target.classList.remove('is-visible');
                     }
                 });
             }, observerOptions);
 
-            // Observe each element with the 'scroll-animate' class
+            // Observe each element with the 'animated-section' class
             animateOnScrollElements.forEach(element => {
                 observer.observe(element);
             });
