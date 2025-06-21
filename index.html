@@ -358,23 +358,28 @@
 
     <!-- Join Server Modal -->
     <div id="join-server-modal" class="modal-overlay fixed inset-0 flex items-center justify-center z-50">
-        <div class="modal-content bg-white p-8 rounded-lg shadow-xl relative w-11/12 max-w-sm">
+        <div class="modal-content bg-white p-8 rounded-lg shadow-xl relative w-11/12 max-w-sm text-center">
             <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
             </button>
-            <h3 class="text-2xl font-bold text-gray-900 mb-4">Tham gia Server NESPOLA</h3>
-            <p class="text-gray-700 mb-4">Sao chép địa chỉ IP sau để kết nối:</p>
-            <div class="bg-gray-100 p-3 rounded-lg text-lg font-mono text-gray-800 break-all mb-6 flex justify-between items-center">
-                <span id="server-ip-display">19.ip.gl.ply.gg:53605</span>
-                <button id="copy-ip-btn" class="ml-4 p-2 rounded-full bg-green-500 text-white hover:bg-green-600 transition-colors duration-200" title="Sao chép IP">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                </button>
-            </div>
-            <p id="copy-message" class="text-green-600 text-sm opacity-0 transition-opacity duration-300">Đã sao chép!</p>
+            <h3 class="text-2xl font-bold text-red-600 mb-4">Lỗi: Server chưa phát hành!</h3>
+            <p class="text-gray-700 mb-4">
+                SERVER HVH BEDWAR NESPOLA hiện chưa được phát hành.
+            </p>
+            <p class="text-gray-700 mb-6 font-semibold">
+                Vui lòng thử lại sau hoặc theo dõi kênh Discord để nhận thông báo sớm nhất nhé!
+            </p>
+            <a
+                href="https://discord.gg/gYTRrGx8Vv"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105"
+            >
+                <i class="fab fa-discord w-5 h-5 mr-2 text-xl"></i>
+                Tham gia Discord
+            </a>
         </div>
     </div>
 
@@ -384,9 +389,9 @@
             const joinServerBtn = document.getElementById('join-server-btn');
             const joinServerModal = document.getElementById('join-server-modal');
             const closeModalBtn = document.getElementById('close-modal-btn');
-            const copyIpBtn = document.getElementById('copy-ip-btn');
-            const serverIpDisplay = document.getElementById('server-ip-display');
-            const copyMessage = document.getElementById('copy-message');
+            // const copyIpBtn = document.getElementById('copy-ip-btn'); // Không còn cần nút sao chép IP nữa
+            // const serverIpDisplay = document.getElementById('server-ip-display'); // Không còn cần hiển thị IP nữa
+            // const copyMessage = document.getElementById('copy-message'); // Không còn cần thông báo sao chép nữa
 
             // JavaScript cho Intersection Observer để kích hoạt animation khi cuộn
             const observerOptions = {
@@ -427,8 +432,7 @@
             // Show modal
             joinServerBtn.addEventListener('click', () => {
                 joinServerModal.classList.add('open');
-                // Reset copy message visibility
-                copyMessage.style.opacity = '0';
+                // Không còn cần reset copy message visibility
             });
 
             // Close modal functions
@@ -445,7 +449,8 @@
                 }
             });
 
-            // Copy IP to clipboard
+            // Phần sao chép IP đã bị loại bỏ vì không còn cần thiết cho modal lỗi
+            /*
             copyIpBtn.addEventListener('click', () => {
                 const ipAddress = serverIpDisplay.textContent;
                 const textarea = document.createElement('textarea');
@@ -461,6 +466,7 @@
                     copyMessage.style.opacity = '0';
                 }, 2000); // Hide after 2 seconds
             });
+            */
         });
     </script>
 </body>
