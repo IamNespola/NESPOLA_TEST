@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ sơ người dùng - Server Nespola</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-400 { animation-delay: 0.4s; }
+
+        .message-box {
+            background-color: #f0fdf4; /* green-50 */
+            color: #16a34a; /* green-700 */
+            border: 1px solid #dcfce7; /* green-100 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .message-box.error {
+            background-color: #fef2f2; /* red-50 */
+            color: #dc2626; /* red-700 */
+            border-color: #fee2e2; /* red-100 */
+        }
+        .message-box.show {
+            opacity: 1;
+        }
+        /* Custom selection highlight color */
+        ::selection {
+          background-color: #34D399; /* Green-500 */
+          color: #ffffff; /* White text on selection */
+        }
+        ::-moz-selection { /* For Firefox */
+          background-color: #34D399;
+          color: #ffffff;
+        }
+    </style>
+    <!-- Firebase SDKs -->
+    <script type="module">
+        // Import các hàm bạn cần từ SDKs bạn muốn sử dụng
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js"; 
+        import { getAuth, onAuthStateChanged, signOut, updateProfile, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js"; 
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js"; 
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
+
+        // Cấu hình Firebase của bạn (đảm bảo 'apiKey' chính xác)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyB2S9V-EhHHsCQ_rxEUgA5DXfeZkFwOijY", // <-- API Key CHÍNH XÁC của bạn
+            authDomain: "nespola-294d7.firebaseapp.com",
+            projectId: "nespola-294d7",
+            storageBucket: "nespola-294d7.firebasestorage.app",
+            messagingSenderId: "893545252364",
+            appId: "1:893545252364:web:3dd780e52ef2a0b5795029",
+            measurementId: "G-2GLRRM71RV" 
+        };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // Khởi tạo Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const analytics = getAnalytics(app);
+
+        // Đăng nhập ẩn danh hoặc bằng custom token cho môi trường Canvas
+        if (typeof __initial_auth_token !== 'undefined') {
+            signInWithCustomToken(auth, __initial_auth_token).catch((error) => {
+                console.error("Lỗi khi đăng nhập bằng custom token:", error);
+                signInAnonymously(auth); // Fallback đăng nhập ẩn danh nếu token thất bại
+            });
+        } else {
+            signInAnonymously(auth).catch((error) => {
+                console.error("Lỗi khi đăng nhập ẩn danh:", error);
+            });
+        }
+
+        // Xuất các instance và hàm Firebase ra đối tượng window để dễ dàng truy cập trong script
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.firebaseDb = db;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.signOut = signOut;
+        window.updateProfile = updateProfile;
+    </script>
+</head>
+<body class="min-h-screen bg-white text-gray-800 antialiased">
+    <div class="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100 z-0 pointer-events-none"></div>
+    <div class="absolute inset-0 z-0 pointer-events-none" style="
+        background-image: url(&quot;data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zm0 20v-4H4v4H0v2h4v4h2v-4h4v-2H6zM36 4V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 4V0H4v4H0v2h4v4h2V6h4V4H6zM21 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM21 0v-4h-2v4h-4v2h4v4h2V6h4V4h-4zM41 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM41 0v-4h-2v4h-4v2h4v4h2V6h4V4h-4zM11 9v-4h-2v4H5v2h4v4h2v-4h4V9h-4zm0 20v-4h-2v4H5v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4H5v2h4v4h2v-4h4v-2h-4zm30-30v-4h-2v4h-4v2h4v4h2v-4h4V9h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E&quot;);
+        background-size: 100px 100px;"></div>
+
+    <header class="relative z-10 bg-white shadow-sm">
+        <nav class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <!-- Logo của server -->
+                <img src="./logo.png" alt="NESPOLA Server Logo" class="h-10 md:h-12 object-contain">
+            </div>
+            <div class="flex items-center space-x-4">
+                <span class="text-gray-600 font-semibold text-sm">v1.8</span>
+            </div>
+            <div class="md:hidden">
+                <button class="p-2 text-gray-600 hover:text-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 rounded-md">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-6rem)] px-4 py-16 md:py-24">
+        <div class="bg-white p-8 md:p-12 rounded-lg shadow-xl w-full max-w-md animate-fade-in-up">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-4 text-center">
+                Hồ sơ người dùng <span class="text-green-600">NESPOLA</span>
+            </h1>
+            <p class="text-md text-gray-600 mb-8 text-center">
+                Cập nhật thông tin cá nhân và tùy chỉnh hồ sơ của bạn.
+            </p>
+
+            <div id="message-box" class="message-box hidden" role="alert"></div>
+
+            <div class="flex flex-col items-center mb-6">
+                <div class="relative w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-5xl overflow-hidden mb-4">
+                    <i class="fas fa-user-circle"></i>
+                    <!-- Placeholder for actual user photo -->
+                    <img id="user-photo" src="" alt="Ảnh đại diện" class="absolute inset-0 w-full h-full object-cover hidden">
+                    <input type="file" id="photo-upload" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                </div>
+                <p id="current-email" class="text-lg font-semibold text-gray-800 mb-2"></p>
+                <button id="change-photo-btn" class="px-4 py-2 bg-blue-500 text-white rounded-md shadow hover:bg-blue-600 transition-colors duration-200">
+                    Thay đổi ảnh đại diện
+                </button>
+            </div>
+
+            <form id="profile-form" class="space-y-6">
+                <div>
+                    <label for="display-name" class="block text-sm font-medium text-gray-700 text-left">Tên hiển thị</label>
+                    <input type="text" id="display-name" name="display-name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm" placeholder="Nhập tên hiển thị của bạn">
+                </div>
+                
+                <button type="submit" class="w-full flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    Cập nhật hồ sơ
+                </button>
+            </form>
+
+            <p class="mt-6 text-center text-sm text-gray-600">
+                <a href="index.html" class="font-medium text-blue-600 hover:text-blue-500 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1">
+                        <path d="M12 19L5 12l7-7M19 12H5"/>
+                    </svg>
+                    Quay lại Trang chủ
+                </a>
+            </p>
+        </div>
+    </main>
+
+    <footer class="bg-gray-100 py-6 text-center text-gray-600 text-sm">
+        <div class="container mx-auto px-4">
+            <p>&copy; 2025 SERVER HVH BEDWAR NESPOLA. All rights reserved.</p>
+            <p class="mt-1">Cre: Jino</p>
+        </div>
+    </footer>
+
+    <script type="module">
+        document.addEventListener('DOMContentLoaded', () => {
+            const auth = window.firebaseAuth;
+            const onAuthStateChanged = window.onAuthStateChanged;
+            const updateProfile = window.updateProfile; // Import updateProfile function
+            const messageBox = document.getElementById('message-box');
+            const currentEmailSpan = document.getElementById('current-email');
+            const displayNameInput = document.getElementById('display-name');
+            const profileForm = document.getElementById('profile-form');
+            const userPhotoImg = document.getElementById('user-photo');
+            const photoUploadInput = document.getElementById('photo-upload');
+            const changePhotoBtn = document.getElementById('change-photo-btn');
+
+            // Hàm hiển thị thông báo
+            const showMessage = (message, isError = false) => {
+                messageBox.textContent = message;
+                messageBox.classList.remove('hidden', 'error');
+                messageBox.classList.add('show');
+                if (isError) {
+                    messageBox.classList.add('error');
+                }
+                setTimeout(() => {
+                    messageBox.classList.remove('show');
+                    // messageBox.classList.add('hidden'); // Ẩn hoàn toàn sau animation
+                }, 3000); // Ẩn sau 3 giây
+            };
+
+            // Lắng nghe trạng thái đăng nhập
+            if (auth && onAuthStateChanged) {
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        // Người dùng đã đăng nhập, hiển thị thông tin
+                        currentEmailSpan.textContent = user.email || '';
+                        displayNameInput.value = user.displayName || '';
+                        if (user.photoURL) {
+                            userPhotoImg.src = user.photoURL;
+                            userPhotoImg.classList.remove('hidden');
+                        } else {
+                            userPhotoImg.classList.add('hidden'); // Ẩn nếu không có ảnh
+                        }
+                    } else {
+                        // Người dùng chưa đăng nhập, chuyển hướng về trang login
+                        showMessage("Bạn cần đăng nhập để truy cập trang này.", true);
+                        setTimeout(() => {
+                            // Xây dựng đường dẫn tuyệt đối dựa trên vị trí hiện tại
+                            const currentPath = window.location.pathname;
+                            const currentDirectory = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
+                            window.location.replace(currentDirectory + 'login.html'); // Đã sửa đường dẫn và dùng replace
+                        }, 2000);
+                    }
+                });
+            } else {
+                console.error("Firebase Auth hoặc onAuthStateChanged chưa được khởi tạo.");
+                showMessage("Lỗi hệ thống: Không thể tải dịch vụ xác thực.", true);
+            }
+
+            // Xử lý cập nhật hồ sơ
+            if (profileForm && updateProfile) {
+                profileForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const user = auth.currentUser;
+                    if (user) {
+                        const newDisplayName = displayNameInput.value;
+                        try {
+                            await updateProfile(user, {
+                                displayName: newDisplayName
+                            });
+                            showMessage("Cập nhật hồ sơ thành công!");
+                        } catch (error) {
+                            console.error("Lỗi cập nhật hồ sơ:", error);
+                            showMessage("Lỗi cập nhật hồ sơ: " + error.message, true);
+                        }
+                    } else {
+                        showMessage("Bạn chưa đăng nhập.", true);
+                    }
+                });
+            }
+
+            // Xử lý thay đổi ảnh đại diện (chỉ là placeholder logic vì Firebase Auth không hỗ trợ upload trực tiếp)
+            if (changePhotoBtn && photoUploadInput) {
+                changePhotoBtn.addEventListener('click', () => {
+                    photoUploadInput.click(); // Kích hoạt input file
+                });
+
+                photoUploadInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        // Đây chỉ là demo hiển thị ảnh cục bộ
+                        // Trong thực tế, bạn cần upload ảnh này lên Firebase Storage
+                        // và sau đó cập nhật photoURL của user bằng URL từ Firebase Storage.
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            userPhotoImg.src = event.target.result;
+                            userPhotoImg.classList.remove('hidden');
+                            showMessage("Ảnh đã được chọn. Để lưu ảnh, bạn cần triển khai chức năng upload lên Firebase Storage và cập nhật hồ sơ.", false);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
