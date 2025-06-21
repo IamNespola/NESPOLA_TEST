@@ -643,6 +643,15 @@
                         chatMessageInput.style.height = 'auto';
                         chatMessageInput.style.height = (chatMessageInput.scrollHeight) + 'px';
                     });
+
+                    // Xử lý sự kiện bàn phím cho chat input: Enter để gửi, Shift+Enter để xuống dòng
+                    chatMessageInput.addEventListener('keydown', (event) => {
+                        if (event.key === 'Enter' && !event.shiftKey) {
+                            event.preventDefault(); // Ngăn hành vi mặc định (xuống dòng)
+                            sendChatButton.click(); // Gửi tin nhắn
+                        }
+                        // Nếu là Shift+Enter, không làm gì cả, cho phép xuống dòng mặc định
+                    });
                 }
             } else {
                 console.error("Firebase Firestore hoặc các hàm liên quan chưa được khởi tạo. Đảm bảo bạn đã import đúng.");
