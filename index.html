@@ -64,6 +64,7 @@
             background: linear-gradient(90deg, #10B981, #6EE7B7, #10B981); /* Darker Green, Lighter Green, Darker Green */
             background-size: 200% 200%;
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: gradient-breath 4s ease infinite; /* Thời gian animation dài hơn, mượt mà */
         }
@@ -123,10 +124,19 @@
                 <img src="./logo.png" alt="NESPOLA Server Logo" class="h-10 md:h-12 object-contain">
             </div>
 
-            <div class="flex items-center space-x-4">
+            <div class="hidden md:flex items-center space-x-4">
+                 <a
+                    href="login.html"
+                    class="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition-colors duration-200"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    Đăng nhập
+                </a>
                 <span class="text-gray-600 font-semibold text-sm">v1.8</span>
             </div>
-            
+
             <div class="md:hidden">
                 <button class="p-2 text-gray-600 hover:text-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 rounded-md">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -356,7 +366,7 @@
         </div>
     </footer>
 
-    <!-- Join Server Modal -->
+    <!-- Join Server Modal (Displays error message when server is not released) -->
     <div id="join-server-modal" class="modal-overlay fixed inset-0 flex items-center justify-center z-50">
         <div class="modal-content bg-white p-8 rounded-lg shadow-xl relative w-11/12 max-w-sm text-center">
             <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
