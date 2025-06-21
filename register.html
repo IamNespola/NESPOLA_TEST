@@ -73,10 +73,18 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; // Đã sửa lỗi "=" thành "from"
 
-        // Firebase configuration from environment variables
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        // Firebase configuration (lấy từ Firebase Console của bạn)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyB2S9V-EhHHsCQ_rxEUgA5DXfeZkFw0ijY",
+            authDomain: "nespola-294d7.firebaseapp.com",
+            projectId: "nespola-294d7",
+            storageBucket: "nespola-294d7.firebasestorage.app",
+            messagingSenderId: "893545252364",
+            appId: "1:893545252364:web:3dd780e52ef2a0b5795029",
+            measurementId: "G-2GLRRM71RV"
+        };
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
         // Initialize Firebase
@@ -84,7 +92,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Sign in anonymously or with custom token
+        // Sign in anonymously or with custom token for Canvas environment
         if (typeof __initial_auth_token !== 'undefined') {
             signInWithCustomToken(auth, __initial_auth_token).catch((error) => {
                 console.error("Error signing in with custom token:", error);
@@ -96,10 +104,11 @@
             });
         }
 
+        // Export Firebase instances and functions to the window object for easier access
         window.firebaseApp = app;
         window.firebaseAuth = auth;
         window.firebaseDb = db;
-        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword; // Expose this function
     </script>
 </head>
 <body class="min-h-screen bg-white text-gray-800 antialiased">
@@ -111,6 +120,7 @@
     <header class="relative z-10 bg-white shadow-sm">
         <nav class="container mx-auto px-4 py-4 flex items-center justify-between">
             <div class="flex items-center space-x-2">
+                <!-- Logo của server -->
                 <img src="./logo.png" alt="NESPOLA Server Logo" class="h-10 md:h-12 object-contain">
             </div>
             <div class="flex items-center space-x-4">
@@ -245,18 +255,22 @@
                     }
 
                     try {
-                        // Using the imported createUserWithEmailAndPassword from global scope
                         const authInstance = window.firebaseAuth;
-                        const createUserWithEmailAndPassword = window.createUserWithEmailAndPassword;
+                        const createUserFn = window.createUserWithEmailAndPassword;
 
-                        const userCredential = await createUserWithEmailAndPassword(authInstance, email, password);
+                        if (!authInstance || !createUserFn) {
+                            console.error("Firebase Auth or createUserWithEmailAndPassword not initialized. Check your Firebase config and enable Email/Password sign-in method in Firebase Console.");
+                            showMessage("Lỗi hệ thống: Không thể kết nối đến dịch vụ đăng ký. Vui lòng thử lại sau.", true);
+                            return;
+                        }
+
+                        const userCredential = await createUserFn(authInstance, email, password);
                         console.log("Đăng ký thành công:", userCredential.user);
                         showMessage("Đăng ký thành công! Đang chuyển hướng đến trang Đăng nhập...", false);
                         
-                        // Redirect to login page after successful registration
                         setTimeout(() => {
                             window.location.href = 'login.html';
-                        }, 1500); // Redirect after 1.5 seconds
+                        }, 1500); 
                     } catch (error) {
                         console.error("Lỗi đăng ký:", error.code, error.message);
                         let errorMessage = "Đăng ký thất bại. Vui lòng thử lại.";
@@ -266,25 +280,28 @@
                             errorMessage = "Email không hợp lệ.";
                         } else if (error.code === 'auth/weak-password') {
                             errorMessage = "Mật khẩu quá yếu (ít nhất 6 ký tự).";
+                        } else if (error.code === 'auth/network-request-failed') {
+                            errorMessage = "Lỗi mạng: Vui lòng kiểm tra kết nối internet của bạn.";
+                        } else if (error.code === 'auth/operation-not-allowed') {
+                            errorMessage = "Đăng ký bằng Email/Mật khẩu chưa được bật. Vui lòng bật nó trong Firebase Console > Authentication > Sign-in method.";
+                        } else if (error.code === 'auth/internal-error' || error.code === 'auth/invalid-api-key') {
+                            errorMessage = "Lỗi cấu hình Firebase. Vui lòng kiểm tra API Key và Project ID của bạn.";
                         }
                         showMessage(errorMessage, true);
                     }
                 });
             }
 
-            // Function to close and reset the modal (for "Server chưa phát hành!" modal)
             const closeAndResetModal = () => {
                 if (joinServerModal) {
                     joinServerModal.classList.remove('open');
                 }
             };
 
-            // Event listener for closing the modal via the 'X' button
             if (closeModalBtn) {
                 closeModalBtn.addEventListener('click', closeAndResetModal);
             }
 
-            // Event listener for closing the modal by clicking outside its content
             if (joinServerModal) {
                 joinServerModal.addEventListener('click', (e) => {
                     if (e.target === joinServerModal) {
