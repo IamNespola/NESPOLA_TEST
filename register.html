@@ -73,42 +73,45 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; // Đã sửa lỗi "=" thành "from"
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
 
-        // Firebase configuration (lấy từ Firebase Console của bạn)
+        // Cấu hình Firebase của bạn (lấy từ Firebase Console của dự án nespola-294d7)
+        // LƯU Ý QUAN TRỌNG: Hãy đảm bảo 'apiKey' ở đây CHÍNH XÁC với API Key từ Firebase Console của bạn.
+        // Lỗi 'auth/api-key-not-valid' thường xảy ra nếu API Key sai.
+        // MeasurementId là tùy chọn, nếu bạn không sử dụng Firebase Analytics, bạn có thể xóa nó.
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "AIzaSyB2S9V-EhHHsCQ_rxEUgA5DXfeZkFw0ijY",
+            apiKey: "AIzaSyB2S9V-EhHHsCQ_rxEUgA5DXfeZkFw0ijY", // <-- Dán API Key CHÍNH XÁC của bạn vào đây
             authDomain: "nespola-294d7.firebaseapp.com",
             projectId: "nespola-294d7",
             storageBucket: "nespola-294d7.firebasestorage.app",
             messagingSenderId: "893545252364",
             appId: "1:893545252364:web:3dd780e52ef2a0b5795029",
-            measurementId: "G-2GLRRM71RV"
+            measurementId: "G-2GLRRM71RV" 
         };
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
-        // Initialize Firebase
+        // Khởi tạo Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Sign in anonymously or with custom token for Canvas environment
+        // Đăng nhập ẩn danh hoặc bằng custom token cho môi trường Canvas
         if (typeof __initial_auth_token !== 'undefined') {
             signInWithCustomToken(auth, __initial_auth_token).catch((error) => {
-                console.error("Error signing in with custom token:", error);
-                signInAnonymously(auth); // Fallback to anonymous sign-in if token fails
+                console.error("Lỗi khi đăng nhập bằng custom token:", error);
+                signInAnonymously(auth); // Fallback đăng nhập ẩn danh nếu token thất bại
             });
         } else {
             signInAnonymously(auth).catch((error) => {
-                console.error("Error signing in anonymously:", error);
+                console.error("Lỗi khi đăng nhập ẩn danh:", error);
             });
         }
 
-        // Export Firebase instances and functions to the window object for easier access
+        // Xuất các instance và hàm Firebase ra đối tượng window để dễ dàng truy cập
         window.firebaseApp = app;
         window.firebaseAuth = auth;
         window.firebaseDb = db;
-        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword; // Expose this function
+        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword; 
     </script>
 </head>
 <body class="min-h-screen bg-white text-gray-800 antialiased">
@@ -219,97 +222,4 @@
     <script type="module">
         document.addEventListener('DOMContentLoaded', () => {
             const registerForm = document.getElementById('register-form');
-            const emailInput = document.getElementById('email');
-            const passwordInput = document.getElementById('password');
-            const confirmPasswordInput = document.getElementById('confirm-password');
-            const messageBox = document.getElementById('message-box');
-
-            const joinServerModal = document.getElementById('join-server-modal');
-            const closeModalBtn = document.getElementById('close-modal-btn');
-
-            // Function to display messages
-            const showMessage = (message, isError = false) => {
-                messageBox.textContent = message;
-                messageBox.classList.remove('hidden', 'error');
-                messageBox.classList.add('show');
-                if (isError) {
-                    messageBox.classList.add('error');
-                }
-                setTimeout(() => {
-                    messageBox.classList.remove('show');
-                    // messageBox.classList.add('hidden'); // Hide completely after animation
-                }, 3000); // Hide after 3 seconds
-            };
-
-            // Handle registration form submission
-            if (registerForm) {
-                registerForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const email = emailInput.value;
-                    const password = passwordInput.value;
-                    const confirmPassword = confirmPasswordInput.value;
-
-                    if (password !== confirmPassword) {
-                        showMessage("Mật khẩu xác nhận không khớp!", true);
-                        return;
-                    }
-
-                    try {
-                        const authInstance = window.firebaseAuth;
-                        const createUserFn = window.createUserWithEmailAndPassword;
-
-                        if (!authInstance || !createUserFn) {
-                            console.error("Firebase Auth or createUserWithEmailAndPassword not initialized. Check your Firebase config and enable Email/Password sign-in method in Firebase Console.");
-                            showMessage("Lỗi hệ thống: Không thể kết nối đến dịch vụ đăng ký. Vui lòng thử lại sau.", true);
-                            return;
-                        }
-
-                        const userCredential = await createUserFn(authInstance, email, password);
-                        console.log("Đăng ký thành công:", userCredential.user);
-                        showMessage("Đăng ký thành công! Đang chuyển hướng đến trang Đăng nhập...", false);
-                        
-                        setTimeout(() => {
-                            window.location.href = 'login.html';
-                        }, 1500); 
-                    } catch (error) {
-                        console.error("Lỗi đăng ký:", error.code, error.message);
-                        let errorMessage = "Đăng ký thất bại. Vui lòng thử lại.";
-                        if (error.code === 'auth/email-already-in-use') {
-                            errorMessage = "Email này đã được sử dụng. Vui lòng sử dụng email khác.";
-                        } else if (error.code === 'auth/invalid-email') {
-                            errorMessage = "Email không hợp lệ.";
-                        } else if (error.code === 'auth/weak-password') {
-                            errorMessage = "Mật khẩu quá yếu (ít nhất 6 ký tự).";
-                        } else if (error.code === 'auth/network-request-failed') {
-                            errorMessage = "Lỗi mạng: Vui lòng kiểm tra kết nối internet của bạn.";
-                        } else if (error.code === 'auth/operation-not-allowed') {
-                            errorMessage = "Đăng ký bằng Email/Mật khẩu chưa được bật. Vui lòng bật nó trong Firebase Console > Authentication > Sign-in method.";
-                        } else if (error.code === 'auth/internal-error' || error.code === 'auth/invalid-api-key') {
-                            errorMessage = "Lỗi cấu hình Firebase. Vui lòng kiểm tra API Key và Project ID của bạn.";
-                        }
-                        showMessage(errorMessage, true);
-                    }
-                });
-            }
-
-            const closeAndResetModal = () => {
-                if (joinServerModal) {
-                    joinServerModal.classList.remove('open');
-                }
-            };
-
-            if (closeModalBtn) {
-                closeModalBtn.addEventListener('click', closeAndResetModal);
-            }
-
-            if (joinServerModal) {
-                joinServerModal.addEventListener('click', (e) => {
-                    if (e.target === joinServerModal) {
-                        closeAndResetModal();
-                    }
-                });
-            }
-        });
-    </script>
-</body>
-</html>
+            co
