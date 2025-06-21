@@ -6,7 +6,7 @@
     <title>SERVER HVH BEDWAR NESPOLA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <!-- Link Font Awesome để dùng icon Discord vector -->
+    <!-- Link Font Awesome để dùng icon Discord và User vector -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
@@ -64,7 +64,6 @@
             background: linear-gradient(90deg, #10B981, #6EE7B7, #10B981); /* Darker Green, Lighter Green, Darker Green */
             background-size: 200% 200%;
             -webkit-background-clip: text;
-            background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: gradient-breath 4s ease infinite; /* Thời gian animation dài hơn, mượt mà */
         }
@@ -109,7 +108,74 @@
             transform: translateY(0);
             opacity: 1;
         }
+
+        /* Style for logged-in user display */
+        .user-display {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem; /* Tailwind 'gap-2' */
+            font-weight: 600; /* Tailwind 'font-semibold' */
+            color: #4A5568; /* Tailwind 'text-gray-700' */
+        }
+        .user-display button {
+            margin-left: 0.5rem; /* Tailwind 'ml-2' */
+            padding: 0.5rem 1rem; /* Tailwind 'px-4 py-2' */
+            background-color: #EF4444; /* Tailwind 'bg-red-500' */
+            color: #FFFFFF; /* Tailwind 'text-white' */
+            border-radius: 0.5rem; /* Tailwind 'rounded-lg' */
+            font-weight: 500; /* Tailwind 'font-medium' */
+            transition: background-color 0.2s ease-in-out;
+        }
+        .user-display button:hover {
+            background-color: #DC2626; /* Tailwind 'hover:bg-red-600' */
+        }
     </style>
+    <!-- Firebase SDKs -->
+    <script type="module">
+        // Import các hàm bạn cần từ SDKs bạn muốn sử dụng
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js"; 
+        import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js"; 
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js"; 
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
+
+        // Cấu hình Firebase của bạn (lấy từ Firebase Console của dự án nespola-294d7)
+        // Đảm bảo 'apiKey' ở đây CHÍNH XÁC với API Key từ Firebase Console của bạn.
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyB2S9V-EhHHsCQ_rxEUgA5DXfeZkFwOijY", // <-- API Key CHÍNH XÁC của bạn
+            authDomain: "nespola-294d7.firebaseapp.com",
+            projectId: "nespola-294d7",
+            storageBucket: "nespola-294d7.firebasestorage.app",
+            messagingSenderId: "893545252364",
+            appId: "1:893545252364:web:3dd780e52ef2a0b5795029",
+            measurementId: "G-2GLRRM71RV" 
+        };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // Khởi tạo Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const analytics = getAnalytics(app);
+
+        // Đăng nhập ẩn danh hoặc bằng custom token cho môi trường Canvas
+        if (typeof __initial_auth_token !== 'undefined') {
+            signInWithCustomToken(auth, __initial_auth_token).catch((error) => {
+                console.error("Lỗi khi đăng nhập bằng custom token:", error);
+                signInAnonymously(auth); // Fallback đăng nhập ẩn danh nếu token thất bại
+            });
+        } else {
+            signInAnonymously(auth).catch((error) => {
+                console.error("Lỗi khi đăng nhập ẩn danh:", error);
+            });
+        }
+
+        // Xuất các instance và hàm Firebase ra đối tượng window để dễ dàng truy cập trong script
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.firebaseDb = db;
+        window.signOut = signOut; // Xuất hàm signOut
+        window.onAuthStateChanged = onAuthStateChanged; // Xuất hàm onAuthStateChanged
+    </script>
 </head>
 <body class="min-h-screen bg-white text-gray-800 antialiased">
     <div class="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100 z-0 pointer-events-none"></div>
@@ -124,17 +190,25 @@
                 <img src="./logo.png" alt="NESPOLA Server Logo" class="h-10 md:h-12 object-contain">
             </div>
 
-            <div class="hidden md:flex items-center space-x-4">
-                 <a
-                    href="login.html"
-                    class="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition-colors duration-200"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
-                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                    </svg>
-                    Đăng nhập
-                </a>
+            <div class="flex items-center space-x-4">
                 <span class="text-gray-600 font-semibold text-sm">v1.8</span>
+                
+                <div id="auth-status-container" class="flex items-center space-x-4">
+                    <a
+                        href="login.html"
+                        id="login-button"
+                        class="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition-colors duration-200"
+                    >
+                        <i class="fas fa-user mr-2"></i> Đăng nhập
+                    </a>
+                    <div id="user-info-display" class="hidden user-display">
+                        <i class="fas fa-user-circle text-xl text-gray-600"></i>
+                        <span id="user-email" class="text-gray-700 font-semibold"></span>
+                        <button id="logout-button" class="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors duration-200 text-sm">
+                            Đăng xuất
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <div class="md:hidden">
@@ -309,7 +383,8 @@
                 </div>
             </div>
 
-            <div class="text-center mt-20 animated-section slide-in-up-on-scroll">
+            <!-- Tham gia cộng đồng section -->
+            <div class="text-center mt-20 scroll-animate">
                 <div class="flex justify-center mb-8">
                     <svg
                       width="64"
@@ -333,24 +408,14 @@
                     </svg>
                 </div>
                 <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">
-                    Tìm hiểu thêm về NESPOLA
+                    Tham gia cộng đồng NESPOLA ngay!
                 </h2>
-                <a
-                    href="#"
-                    class="inline-flex items-center px-6 py-3 bg-green-500 text-white font-semibold rounded-lg shadow-lg hover:bg-green-600 transition-all duration-300 transform hover:scale-105"
-                >
-                    Truy cập Blog <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                </a>
-            </div>
-            
-            <div class="text-center mt-8 animated-section slide-in-up-on-scroll">
                 <a
                     href="https://discord.gg/gYTRrGx8Vv"
                     target="_blank"
                     rel="noopener noreferrer"
                     class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105"
                 >
-                    <!-- Sử dụng Font Awesome icon thay vì ảnh PNG -->
                     <i class="fab fa-discord w-5 h-5 mr-2 text-xl"></i>
                     Tham gia Discord
                 </a>
@@ -359,14 +424,7 @@
         </div>
     </section>
 
-    <footer class="bg-gray-100 py-6 text-center text-gray-600 text-sm">
-        <div class="container mx-auto px-4">
-            <p>&copy; 2025 SERVER HVH BEDWAR NESPOLA. All rights reserved.</p>
-            <p class="mt-1">Cre: Jino</p>
-        </div>
-    </footer>
-
-    <!-- Join Server Modal (Displays error message when server is not released) -->
+    <!-- Join Server Modal (Now displays the error message as per user request) -->
     <div id="join-server-modal" class="modal-overlay fixed inset-0 flex items-center justify-center z-50">
         <div class="modal-content bg-white p-8 rounded-lg shadow-xl relative w-11/12 max-w-sm text-center">
             <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
@@ -395,88 +453,108 @@
 
     <script type="module">
         document.addEventListener('DOMContentLoaded', () => {
-            const exploreBtn = document.getElementById('explore-server-btn');
+            const loginButton = document.getElementById('login-button');
+            const userInfoDisplay = document.getElementById('user-info-display');
+            const userEmailSpan = document.getElementById('user-email');
+            const logoutButton = document.getElementById('logout-button');
+
             const joinServerBtn = document.getElementById('join-server-btn');
             const joinServerModal = document.getElementById('join-server-modal');
             const closeModalBtn = document.getElementById('close-modal-btn');
-            // const copyIpBtn = document.getElementById('copy-ip-btn'); // Không còn cần nút sao chép IP nữa
-            // const serverIpDisplay = document.getElementById('server-ip-display'); // Không còn cần hiển thị IP nữa
-            // const copyMessage = document.getElementById('copy-message'); // Không còn cần thông báo sao chép nữa
 
-            // JavaScript cho Intersection Observer để kích hoạt animation khi cuộn
+            // --- Logic xử lý trạng thái đăng nhập ---
+            const auth = window.firebaseAuth;
+            const onAuthStateChanged = window.onAuthStateChanged;
+            const signOut = window.signOut;
+
+            if (auth && onAuthStateChanged) {
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        // Người dùng đã đăng nhập
+                        loginButton.classList.add('hidden'); // Ẩn nút Đăng nhập
+                        userInfoDisplay.classList.remove('hidden'); // Hiển thị thông tin người dùng
+                        userEmailSpan.textContent = user.email || 'Người dùng'; // Hiển thị email hoặc 'Người dùng'
+                    } else {
+                        // Người dùng chưa đăng nhập
+                        loginButton.classList.remove('hidden'); // Hiển thị nút Đăng nhập
+                        userInfoDisplay.classList.add('hidden'); // Ẩn thông tin người dùng
+                    }
+                });
+
+                // Xử lý sự kiện đăng xuất
+                if (logoutButton) {
+                    logoutButton.addEventListener('click', async () => {
+                        try {
+                            await signOut(auth);
+                            console.log("Đăng xuất thành công!");
+                            // Tự động chuyển hướng hoặc cập nhật UI đã được onAuthStateChanged xử lý
+                        } catch (error) {
+                            console.error("Lỗi khi đăng xuất:", error);
+                            alert("Có lỗi khi đăng xuất. Vui lòng thử lại.");
+                        }
+                    });
+                }
+            } else {
+                console.error("Firebase Auth hoặc onAuthStateChanged chưa được khởi tạo. Đảm bảo bạn đã import đúng.");
+            }
+            // --- Kết thúc logic xử lý trạng thái đăng nhập ---
+
+
+            // Function to open the modal (for "Server IP" button)
+            const openModal = () => {
+                if (joinServerModal) {
+                    joinServerModal.classList.add('open');
+                }
+            };
+
+            // Function to close and reset the modal
+            const closeAndResetModal = () => {
+                if (joinServerModal) {
+                    joinServerModal.classList.remove('open');
+                }
+            };
+
+            // Event listener for the "Server IP" button in the main section
+            if (joinServerBtn) {
+                joinServerBtn.addEventListener('click', openModal);
+            }
+
+            // Event listener for closing the modal via the 'X' button
+            if (closeModalBtn) {
+                closeModalBtn.addEventListener('click', closeAndResetModal);
+            }
+
+            // Event listener for closing the modal by clicking outside its content
+            if (joinServerModal) {
+                joinServerModal.addEventListener('click', (e) => {
+                    if (e.target === joinServerModal) { // Check if click target is the overlay itself
+                        closeAndResetModal();
+                    }
+                });
+            }
+
+            // Intersection Observer for scroll-triggered animations (animate elements as they come into view)
+            const animateOnScrollElements = document.querySelectorAll('.scroll-animate');
+
             const observerOptions = {
-                root: null, // viewport
+                root: null, // Use the viewport as the root
                 rootMargin: '0px',
-                threshold: 0.1 // Kích hoạt khi 10% của phần tử hiển thị
+                threshold: 0.2 // Trigger when 20% of the element is visible
             };
 
             const observer = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('is-visible');
-                        // Có thể dừng quan sát sau khi đã nhìn thấy để animation chỉ chạy một lần
-                        // Nếu muốn animation chạy lại mỗi lần cuộn qua, hãy bỏ dòng này
-                        // observer.unobserve(entry.target); 
-                    } else {
-                        // Nếu muốn animation reset khi cuộn ra khỏi viewport
-                        // entry.target.classList.remove('is-visible');
+                        observer.unobserve(entry.target); // Stop observing once animated to prevent re-animation
                     }
                 });
             }, observerOptions);
 
-            // Quan sát các phần tử có class 'animated-section'
-            document.querySelectorAll('.animated-section').forEach(section => {
-                observer.observe(section);
+            // Observe each element with the 'scroll-animate' class
+            animateOnScrollElements.forEach(element => {
+                observer.observe(element);
             });
-
-            // Smooth scroll cho nút "Khám phá server" (đã có nhưng đảm bảo lại)
-            exploreBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                const targetId = exploreBtn.getAttribute('href').substring(1);
-                const targetElement = document.getElementById(targetId);
-                if (targetElement) {
-                    targetElement.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-
-            // Show modal
-            joinServerBtn.addEventListener('click', () => {
-                joinServerModal.classList.add('open');
-                // Không còn cần reset copy message visibility
-            });
-
-            // Close modal functions
-            const closeAndResetModal = () => {
-                joinServerModal.classList.remove('open');
-            };
-
-            closeModalBtn.addEventListener('click', closeAndResetModal);
-
-            // Close modal when clicking outside of it
-            joinServerModal.addEventListener('click', (e) => {
-                if (e.target === joinServerModal) {
-                    closeAndResetModal();
-                }
-            });
-
-            // Phần sao chép IP đã bị loại bỏ vì không còn cần thiết cho modal lỗi
-            /*
-            copyIpBtn.addEventListener('click', () => {
-                const ipAddress = serverIpDisplay.textContent;
-                const textarea = document.createElement('textarea');
-                textarea.value = ipAddress;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-
-                // Show "Copied!" message
-                copyMessage.style.opacity = '1';
-                setTimeout(() => {
-                    copyMessage.style.opacity = '0';
-                }, 2000); // Hide after 2 seconds
-            });
-            */
         });
     </script>
 </body>
