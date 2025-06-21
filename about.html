@@ -86,7 +86,7 @@
 
     <!-- Main Content Section for About Page -->
     <!-- This section can be placed inside the main tag of your index.html if you want to use a single page application structure,
-         or simply placed in a new about.html file with your index.html's header and footer around it. -->
+        or simply placed in a new about.html file with your index.html's header and footer around it. -->
     <main class="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-6rem)] text-center px-4 py-16 md:py-24">
         <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight mb-4 animate-fade-in-up">
             Về SERVER HVH BEDWAR <br />
@@ -266,25 +266,30 @@
         </div>
     </section>
 
-    <!-- Join Server Modal - Keep consistent with index.html -->
+    <!-- Join Server Modal (Now displays the error message as per user request) -->
     <div id="join-server-modal" class="modal-overlay fixed inset-0 flex items-center justify-center z-50">
-        <div class="modal-content bg-white p-8 rounded-lg shadow-xl relative w-11/12 max-w-sm">
+        <div class="modal-content bg-white p-8 rounded-lg shadow-xl relative w-11/12 max-w-sm text-center">
             <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
             </button>
-            <h3 class="text-2xl font-bold text-gray-900 mb-4">Tham gia Server NESPOLA</h3>
-            <p class="text-gray-700 mb-4">Sao chép địa chỉ IP sau để kết nối:</p>
-            <div class="bg-gray-100 p-3 rounded-lg text-lg font-mono text-gray-800 break-all mb-6 flex justify-between items-center">
-                <span id="server-ip-display">19.ip.gl.ply.gg:53605</span>
-                <button id="copy-ip-btn" class="ml-4 p-2 rounded-full bg-green-500 text-white hover:bg-green-600 transition-colors duration-200" title="Sao chép IP">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                </button>
-            </div>
-            <p id="copy-message" class="text-green-600 text-sm opacity-0 transition-opacity duration-300">Đã sao chép!</p>
+            <h3 class="text-2xl font-bold text-red-600 mb-4">Lỗi: Server chưa phát hành!</h3>
+            <p class="text-gray-700 mb-4">
+                SERVER HVH BEDWAR NESPOLA hiện chưa được phát hành.
+            </p>
+            <p class="text-gray-700 mb-6 font-semibold">
+                Vui lòng thử lại sau hoặc theo dõi kênh Discord để nhận thông báo sớm nhất nhé!
+            </p>
+            <a
+                href="https://discord.gg/gYTRrGx8Vv"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105"
+            >
+                <i class="fab fa-discord w-5 h-5 mr-2 text-xl"></i>
+                Tham gia Discord
+            </a>
         </div>
     </div>
 
@@ -293,60 +298,46 @@
             const joinServerBtn = document.getElementById('join-server-btn');
             const joinServerModal = document.getElementById('join-server-modal');
             const closeModalBtn = document.getElementById('close-modal-btn');
-            const copyIpBtn = document.getElementById('copy-ip-btn');
-            const serverIpDisplay = document.getElementById('server-ip-display');
-            const copyMessage = document.getElementById('copy-message');
+            // 'copyIpBtn', 'serverIpDisplay', 'copyMessage' are no longer relevant for this error modal.
 
-            // Show modal
-            if (joinServerBtn) { // Check if element exists before adding listener
-                joinServerBtn.addEventListener('click', () => {
+            // Function to open the modal
+            const openModal = () => {
+                if (joinServerModal) {
                     joinServerModal.classList.add('open');
-                    copyMessage.style.opacity = '0'; // Reset copy message visibility
-                });
-            }
-
-            // Close modal functions
-            const closeAndResetModal = () => {
-                joinServerModal.classList.remove('open');
+                }
             };
 
-            if (closeModalBtn) { // Check if element exists before adding listener
+            // Function to close and reset the modal
+            const closeAndResetModal = () => {
+                if (joinServerModal) {
+                    joinServerModal.classList.remove('open');
+                }
+            };
+
+            // Event listener for the "Server IP" button in the main section
+            if (joinServerBtn) {
+                joinServerBtn.addEventListener('click', openModal);
+            }
+
+            // Event listener for closing the modal via the 'X' button
+            if (closeModalBtn) {
                 closeModalBtn.addEventListener('click', closeAndResetModal);
             }
 
-            // Close modal when clicking outside of it
-            if (joinServerModal) { // Check if element exists before adding listener
+            // Event listener for closing the modal by clicking outside its content
+            if (joinServerModal) {
                 joinServerModal.addEventListener('click', (e) => {
-                    if (e.target === joinServerModal) {
+                    if (e.target === joinServerModal) { // Check if click target is the overlay itself
                         closeAndResetModal();
                     }
                 });
             }
 
-            // Copy IP to clipboard
-            if (copyIpBtn) { // Check if element exists before adding listener
-                copyIpBtn.addEventListener('click', () => {
-                    const ipAddress = serverIpDisplay.textContent;
-                    const textarea = document.createElement('textarea');
-                    textarea.value = ipAddress;
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textarea);
-
-                    // Show "Copied!" message
-                    copyMessage.style.opacity = '1';
-                    setTimeout(() => {
-                        copyMessage.style.opacity = '0';
-                    }, 2000); // Hide after 2 seconds
-                });
-            }
-
-            // Intersection Observer for scroll-triggered animations
+            // Intersection Observer for scroll-triggered animations (animate elements as they come into view)
             const animateOnScrollElements = document.querySelectorAll('.scroll-animate');
 
             const observerOptions = {
-                root: null, // viewport as the root
+                root: null, // Use the viewport as the root
                 rootMargin: '0px',
                 threshold: 0.2 // Trigger when 20% of the element is visible
             };
@@ -355,11 +346,12 @@
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('is-visible');
-                        observer.unobserve(entry.target); // Stop observing once animated
+                        observer.unobserve(entry.target); // Stop observing once animated to prevent re-animation
                     }
                 });
             }, observerOptions);
 
+            // Observe each element with the 'scroll-animate' class
             animateOnScrollElements.forEach(element => {
                 observer.observe(element);
             });
