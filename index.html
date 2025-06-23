@@ -206,12 +206,24 @@
             color: #9CA3AF; /* gray-400 */
             margin-left: 0.5rem;
         }
+
+        /* Styling for Ban Modal */
+        #ban-modal .modal-content {
+            background-color: #FEE2E2; /* Red-100 */
+            border: 2px solid #EF4444; /* Red-500 */
+        }
+        #ban-modal .modal-content h3 {
+            color: #DC2626; /* Red-600 */
+        }
+        #ban-modal .modal-content p {
+            color: #B91C1C; /* Red-700 */
+        }
     </style>
     <!-- Firebase SDKs - Re-enabled Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js"; 
         import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js"; 
-        import { getFirestore, collection, query, orderBy, addDoc, serverTimestamp, onSnapshot, doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js"; 
+        import { getFirestore, collection, query, orderBy, addDoc, serverTimestamp, onSnapshot, doc, getDoc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js"; 
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
 
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
@@ -257,6 +269,7 @@
         window.firestoreGetDoc = getDoc; 
         window.firestoreSetDoc = setDoc; 
         window.firestoreDeleteDoc = deleteDoc; 
+        window.firestoreUpdateDoc = updateDoc; // Export updateDoc
         window.appId = appId; 
     </script>
 </head>
@@ -546,12 +559,25 @@
         </div>
     </div>
 
+    <!-- Ban Modal (New) -->
+    <div id="ban-modal" class="modal-overlay fixed inset-0 flex items-center justify-center z-50">
+        <div class="modal-content bg-white p-8 rounded-lg shadow-xl relative w-11/12 max-w-md text-center">
+            <button id="close-ban-modal-btn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <h3 class="text-2xl font-bold text-red-600 mb-4">Bạn đã bị cấm!</h3>
+            <p id="ban-reason-display" class="text-gray-700 mb-2"></p>
+            <p id="ban-until-display" class="text-gray-700 mb-6"></p>
+        </div>
+    </div>
+
     <script type="module">
         document.addEventListener('DOMContentLoaded', () => {
             const loginButton = document.getElementById('login-button');
             const userInfoDisplay = document.getElementById('user-info-display');
             const userEmailLink = document.getElementById('user-email-link');
-            // const userRoleDisplay = document.getElementById('user-role-display'); // Removed
             const logoutButton = document.getElementById('logout-button');
 
             const joinServerBtn = document.getElementById('join-server-btn');
@@ -562,6 +588,12 @@
             const chatMessagesDiv = document.getElementById('chat-messages');
             const chatMessageInput = document.getElementById('chat-message-input');
             const sendChatButton = document.getElementById('send-chat-button');
+
+            // Ban Modal elements
+            const banModal = document.getElementById('ban-modal');
+            const closeBanModalBtn = document.getElementById('close-ban-modal-btn');
+            const banReasonDisplay = document.getElementById('ban-reason-display');
+            const banUntilDisplay = document.getElementById('ban-until-display');
 
             // Firebase instances and functions from window object
             const auth = window.firebaseAuth;
@@ -578,13 +610,15 @@
             const firestoreGetDoc = window.firestoreGetDoc; 
             const firestoreSetDoc = window.firestoreSetDoc; 
             const firestoreDeleteDoc = window.firestoreDeleteDoc; 
-            // window.firestoreUpdateDoc = updateDoc; // Removed as roles are gone
+            const firestoreUpdateDoc = window.firestoreUpdateDoc; // Import updateDoc
             const appId = window.appId; 
 
 
             let currentUserDisplayName = 'Khách'; 
-            // let currentUserRole = 'Thành viên'; // Removed
             let currentUserId = null; 
+            let currentUserForbiddenWordCount = 0; // Thêm biến để lưu số từ cấm của user
+            let isBanned = false; // Trạng thái cấm của người dùng
+            let banDetails = null; // Chi tiết về lệnh cấm
 
             // Spam prevention variables
             let lastMessageTime = 0;
@@ -631,15 +665,69 @@
                 const normalizedNewMessage = normalizeString(message);
                 return lastSentMessages.some(lastMsg => {
                     const normalizedLastMsg = normalizeString(lastMsg);
-                    // Có thể thêm ngưỡng tương tự nếu muốn (ví dụ, >90% giống nhau)
                     // Hiện tại chỉ so sánh y hệt để đơn giản
                     return normalizedNewMessage === normalizedLastMsg;
                 });
             };
 
+            // Hàm hiển thị modal cấm
+            const showBanModal = (reason, banUntil) => {
+                banReasonDisplay.textContent = `Lý do: ${reason}`;
+                if (banUntil === 'permanent') {
+                    banUntilDisplay.textContent = `Bạn đã bị cấm vĩnh viễn.`;
+                } else {
+                    const untilDate = new Date(banUntil);
+                    banUntilDisplay.textContent = `Bạn sẽ bị cấm đến: ${untilDate.toLocaleString('vi-VN')}`;
+                }
+                banModal.classList.add('open');
+                // Tự động ẩn modal sau 5 giây nếu không phải ban vĩnh viễn
+                if (banUntil !== 'permanent') {
+                    setTimeout(() => {
+                        banModal.classList.remove('open');
+                    }, 5000);
+                }
+            };
+
+            // Hàm đóng modal cấm
+            const closeBanModal = () => {
+                banModal.classList.remove('open');
+            };
+            
+            // Xử lý sự kiện đóng modal cấm
+            closeBanModalBtn.addEventListener('click', closeBanModal);
+            banModal.addEventListener('click', (e) => {
+                if (e.target === banModal) {
+                    closeBanModal();
+                }
+            });
+
+            // Hàm áp dụng lệnh cấm
+            const applyBan = async (userId, banDurationDays, reason, banLevel) => {
+                const banUntil = banDurationDays === 'permanent' ? 'permanent' : new Date(Date.now() + banDurationDays * 24 * 60 * 60 * 1000);
+                
+                const banDocRef = firestoreDoc(db, 'banned_users', userId); // Collection 'banned_users'
+                
+                try {
+                    await firestoreSetDoc(banDocRef, {
+                        userId: userId,
+                        userName: currentUserDisplayName,
+                        banReason: reason,
+                        banUntil: banUntil,
+                        banLevel: banLevel,
+                        bannedAt: firestoreServerTimestamp()
+                    }, { merge: true });
+                    isBanned = true;
+                    banDetails = { reason, banUntil };
+                    console.warn(`Người dùng ${currentUserDisplayName} (${userId}) đã bị cấm. Lý do: ${reason}, Đến: ${banUntil}. Cấp độ ban: ${banLevel}`);
+                    showBanModal(reason, banUntil === 'permanent' ? 'permanent' : banUntil.getTime());
+                } catch (error) {
+                    console.error("Lỗi khi áp dụng lệnh cấm:", error);
+                    alert("Không thể áp dụng lệnh cấm: " + error.message);
+                }
+            };
 
             // --- Logic xử lý trạng thái đăng nhập và tải thông tin hồ sơ ---
-            if (auth && onAuthStateChanged && db && firestoreDoc && firestoreGetDoc && firestoreSetDoc) {
+            if (auth && onAuthStateChanged && db && firestoreDoc && firestoreGetDoc && firestoreSetDoc && firestoreUpdateDoc) {
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         loginButton.classList.add('hidden');
@@ -647,38 +735,71 @@
                         currentUserId = user.uid; 
 
                         const userProfileRef = firestoreDoc(db, 'artifacts', appId, 'users', user.uid, 'user_profile_data', 'profile_doc');
+                        const banDocRef = firestoreDoc(db, 'banned_users', user.uid);
+
                         try {
-                            const docSnap = await firestoreGetDoc(userProfileRef);
-                            if (docSnap.exists()) {
-                                const profileData = docSnap.data();
+                            // Fetch user profile
+                            const profileSnap = await firestoreGetDoc(userProfileRef);
+                            if (profileSnap.exists()) {
+                                const profileData = profileSnap.data();
                                 currentUserDisplayName = profileData.userName || user.displayName || user.email || 'Người dùng';
-                                // currentUserRole = profileData.userRole || 'Thành viên'; // Removed
+                                currentUserForbiddenWordCount = profileData.forbiddenWordCount || 0;
                             } else {
                                 // Create a default profile if it doesn't exist
                                 currentUserDisplayName = user.displayName || user.email || 'Người dùng';
-                                // currentUserRole = 'Thành viên'; // Removed
+                                currentUserForbiddenWordCount = 0;
                                 await firestoreSetDoc(userProfileRef, {
                                     userName: currentUserDisplayName,
-                                    // userRole: currentUserRole, // Removed
+                                    forbiddenWordCount: currentUserForbiddenWordCount,
                                     createdAt: firestoreServerTimestamp()
                                 }, { merge: true }); 
                             }
-                        } catch (profileError) {
-                            console.error("Lỗi khi tải hoặc tạo hồ sơ người dùng:", profileError);
-                            // Fallback to basic user info if profile loading fails
+
+                            // Check ban status
+                            const banSnap = await firestoreGetDoc(banDocRef);
+                            if (banSnap.exists()) {
+                                const banData = banSnap.data();
+                                const banUntilTimestamp = banData.banUntil;
+
+                                if (banUntilTimestamp === 'permanent' || (banUntilTimestamp && banUntilTimestamp.toDate() > new Date())) {
+                                    isBanned = true;
+                                    banDetails = {
+                                        reason: banData.banReason,
+                                        banUntil: banUntilTimestamp === 'permanent' ? 'permanent' : banUntilTimestamp.toDate()
+                                    };
+                                    showBanModal(banDetails.reason, banDetails.banUntil === 'permanent' ? 'permanent' : banDetails.banUntil.getTime());
+                                    console.warn(`Người dùng ${currentUserDisplayName} (${currentUserId}) đang bị cấm.`);
+                                } else {
+                                    // Ban has expired, remove ban record and reset banLevel if needed
+                                    await firestoreDeleteDoc(banDocRef);
+                                    isBanned = false;
+                                    banDetails = null;
+                                    // Optionally reset forbiddenWordCount or banLevel in profile if ban expired naturally
+                                    // await firestoreUpdateDoc(userProfileRef, { banLevel: 0 }); 
+                                }
+                            } else {
+                                isBanned = false;
+                                banDetails = null;
+                            }
+
+                        } catch (error) {
+                            console.error("Lỗi khi tải hồ sơ hoặc trạng thái cấm:", error);
                             currentUserDisplayName = user.displayName || user.email || 'Người dùng';
-                            // currentUserRole = 'Thành viên'; // Removed
+                            currentUserForbiddenWordCount = 0;
+                            isBanned = false;
+                            banDetails = null;
                         }
                         
                         userEmailLink.textContent = currentUserDisplayName; 
                         userEmailLink.href = 'userinfo.html'; 
-                        // userRoleDisplay.textContent = `(${currentUserRole})`; // Removed
                     } else {
                         loginButton.classList.remove('hidden');
                         userInfoDisplay.classList.add('hidden');
                         currentUserDisplayName = 'Khách';
-                        // currentUserRole = 'Thành viên'; // Removed
                         currentUserId = null; 
+                        currentUserForbiddenWordCount = 0;
+                        isBanned = false;
+                        banDetails = null;
                     }
                 });
 
@@ -689,10 +810,11 @@
                             console.log("Đăng xuất thành công!");
                             // Reset current user info and last messages after logout
                             currentUserDisplayName = 'Khách';
-                            // currentUserRole = 'Thành viên'; // Removed
                             currentUserId = null;
+                            currentUserForbiddenWordCount = 0;
+                            isBanned = false;
+                            banDetails = null;
                             userEmailLink.textContent = '';
-                            // userRoleDisplay.textContent = ''; // Removed
                             lastSentMessages = []; // Clear last sent messages
                         } catch (error) {
                             console.error("Lỗi khi đăng xuất:", error);
@@ -703,12 +825,7 @@
                 console.error("Firebase Auth, Firestore hoặc các hàm liên quan chưa được khởi tạo. Đảm bảo bạn đã import đúng.");
             }
             // --- Kết thúc logic xử lý trạng thái đăng nhập và tải thông tin hồ sơ ---
-
-            // Hàm kiểm tra quyền của người dùng (Co-Owner/Admin) - Removed entirely as roles are removed
-            // const hasModerationRights = (role) => {
-            //     return role === 'Co-Owner' || role === 'Admin';
-            // };
-
+            
             // Hàm xóa tin nhắn
             const deleteChatMessage = async (messageId, messageUserId) => {
                 // Modified: Now only allows a user to delete their own messages if logged in
@@ -730,7 +847,7 @@
             };
 
             // --- Logic cho chức năng chat ---
-            if (db && firestoreCollection && firestoreQuery && firestoreOrderBy && firestoreOnSnapshot && firestoreDeleteDoc) {
+            if (db && firestoreCollection && firestoreQuery && firestoreOrderBy && firestoreOnSnapshot && firestoreDeleteDoc && firestoreUpdateDoc) {
                 const messagesRef = firestoreCollection(db, "chat_messages");
                 const q = firestoreQuery(messagesRef, firestoreOrderBy("timestamp")); 
 
@@ -747,7 +864,6 @@
                         messageElement.classList.add('chat-message');
                         
                         const senderName = message.userName || 'Khách';
-                        // const senderRole = message.userRole || 'Thành viên'; // Removed
                         const senderUserId = message.userId || 'N/A'; 
                         const timestamp = message.timestamp ? new Date(message.timestamp.toDate()).toLocaleTimeString('vi-VN') : 'Vừa xong'; 
 
@@ -816,10 +932,45 @@
                              return;
                         }
                         
-                        // Forbidden words check
-                        if (containsForbiddenWord(messageText)) {
-                            alert("Tin nhắn chứa từ ngữ không phù hợp. Vui lòng sử dụng ngôn ngữ văn minh.");
+                        // Check if user is banned before allowing to send message
+                        if (isBanned) {
+                            const banUntilText = banDetails.banUntil === 'permanent' ? 'vĩnh viễn' : `đến ${banDetails.banUntil.toLocaleString('vi-VN')}`;
+                            showBanModal(banDetails.reason, banDetails.banUntil === 'permanent' ? 'permanent' : banDetails.banUntil.getTime());
+                            alert(`Bạn đang bị cấm gửi tin nhắn. Lý do: ${banDetails.reason}. Cấm đến: ${banUntilText}.`);
                             return;
+                        }
+
+
+                        // Forbidden words check and auto-ban logic
+                        if (containsForbiddenWord(messageText)) {
+                            currentUserForbiddenWordCount++;
+                            const userProfileRef = firestoreDoc(db, 'artifacts', appId, 'users', currentUserId, 'user_profile_data', 'profile_doc');
+                            const banDocRef = firestoreDoc(db, 'banned_users', currentUserId);
+
+                            let currentBanLevel = 0;
+                            const banSnap = await firestoreGetDoc(banDocRef);
+                            if (banSnap.exists()) {
+                                currentBanLevel = banSnap.data().banLevel || 0;
+                            }
+
+                            if (currentUserForbiddenWordCount >= 2000 && currentBanLevel < 4) {
+                                await applyBan(currentUserId, 'permanent', 'Sử dụng từ ngữ không phù hợp (vĩnh viễn)', 4);
+                            } else if (currentUserForbiddenWordCount >= 1000 && currentBanLevel < 3) {
+                                await applyBan(currentUserId, 30, 'Sử dụng từ ngữ không phù hợp (30 ngày)', 3); // 30 days
+                            } else if (currentUserForbiddenWordCount >= 500 && currentBanLevel < 2) {
+                                await applyBan(currentUserId, 7, 'Sử dụng từ ngữ không phù hợp (7 ngày)', 2); // 7 days
+                            } else if (currentUserForbiddenWordCount >= 100 && currentBanLevel < 1) {
+                                await applyBan(currentUserId, 1, 'Sử dụng từ ngữ không phù hợp (1 ngày)', 1); // 1 day
+                            }
+                            
+                            // Update forbidden word count in user profile
+                            await firestoreUpdateDoc(userProfileRef, {
+                                forbiddenWordCount: currentUserForbiddenWordCount
+                            });
+
+                            alert("Tin nhắn chứa từ ngữ không phù hợp. Vui lòng sử dụng ngôn ngữ văn minh.");
+                            // Do not send the message if it contains forbidden words
+                            return; 
                         }
 
                         lastMessageTime = currentTime; // Update last send time
@@ -831,7 +982,6 @@
                             await firestoreAddDoc(messagesRef, {
                                 text: messageText,
                                 userName: currentUserDisplayName, 
-                                // userRole: currentUserRole, // Removed      
                                 userId: userId, 
                                 timestamp: firestoreServerTimestamp()
                             });
@@ -848,7 +998,7 @@
                             console.error("Lỗi khi gửi tin nhắn:", error);
                             if (error.code === 'permission-denied') {
                                 alert("Lỗi quyền truy cập: Bạn không có quyền gửi tin nhắn. Vui lòng kiểm tra quy tắc bảo mật Firebase Firestore của bạn.");
-                                console.error("Vui lòng kiểm tra quy tắc bảo mật Firebase Firestore của bạn để cho phép đọc/ghi vào collection 'chat_messages' và 'user_profile_data'.");
+                                console.error("Vui lòng kiểm tra quy tắc bảo mật Firebase Firestore của bạn để cho phép đọc/ghi vào collection 'chat_messages' và 'user_profile_data' và 'banned_users'.");
                             } else {
                                 alert("Không thể gửi tin nhắn: " + error.message); 
                             }
