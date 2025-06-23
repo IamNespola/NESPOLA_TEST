@@ -154,16 +154,7 @@
             color: #2D3748; /* gray-800 */
         }
         /* Style for user role in chat */
-        .chat-user-role {
-            font-size: 0.75rem; /* text-xs */
-            font-weight: normal;
-            color: #6B7280; /* gray-500 */
-            margin-left: 0.5rem;
-            padding: 0.1rem 0.4rem;
-            background-color: #E5E7EB; /* gray-200 */
-            border-radius: 0.3rem;
-            vertical-align: middle;
-        }
+        /* Removed .chat-user-role style as roles are removed */
         .chat-message-text {
             font-size: 0.95rem;
             color: #4A5568; /* gray-700 */
@@ -195,12 +186,7 @@
             background-color: #10B981; /* Green-600 */
         }
         /* Style for user role in header */
-        .header-user-role {
-            font-size: 0.75rem;
-            font-weight: normal;
-            color: #34D399; /* Green-500 */
-            margin-left: 0.5rem;
-        }
+        /* Removed .header-user-role style as roles are removed */
         .delete-message-btn {
             background: none;
             border: none;
@@ -225,14 +211,14 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js"; 
         import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js"; 
-        import { getFirestore, collection, query, orderBy, addDoc, serverTimestamp, onSnapshot, doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js"; // Added Firestore imports
+        import { getFirestore, collection, query, orderBy, addDoc, serverTimestamp, onSnapshot, doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js"; 
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
 
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyB2S9V-EhHHsCQ_rxEUgA5DXfeZkFwOijY",
             authDomain: "nespola-294d7.firebaseapp.com",
             projectId: "nespola-294d7",
-            storageBucket: "nespola-294d7.appspot.com", // Updated to appspot.com for consistency with userinfo.html
+            storageBucket: "nespola-294d7.appspot.com", 
             messagingSenderId: "893545252364",
             appId: "1:893545252364:web:3dd780e52ef2a0b5795029",
             measurementId: "G-2GLRRM71RV" 
@@ -241,7 +227,7 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app); // Initialize Firestore
+        const db = getFirestore(app); 
         const analytics = getAnalytics(app);
 
         if (typeof __initial_auth_token !== 'undefined') {
@@ -257,7 +243,7 @@
 
         window.firebaseApp = app;
         window.firebaseAuth = auth;
-        window.firebaseDb = db; // Export db instance
+        window.firebaseDb = db; 
         window.signOut = signOut;
         window.onAuthStateChanged = onAuthStateChanged;
         // Export Firestore functions for use in script
@@ -267,11 +253,11 @@
         window.firestoreAddDoc = addDoc;
         window.firestoreServerTimestamp = serverTimestamp;
         window.firestoreOnSnapshot = onSnapshot;
-        window.firestoreDoc = doc; // Export doc for profile management
-        window.firestoreGetDoc = getDoc; // Export getDoc for profile management
-        window.firestoreSetDoc = setDoc; // Export setDoc for profile management
-        window.firestoreDeleteDoc = deleteDoc; // Export deleteDoc for message deletion
-        window.appId = appId; // Export appId
+        window.firestoreDoc = doc; 
+        window.firestoreGetDoc = getDoc; 
+        window.firestoreSetDoc = setDoc; 
+        window.firestoreDeleteDoc = deleteDoc; 
+        window.appId = appId; 
     </script>
 </head>
 <body class="min-h-screen bg-white text-gray-800 antialiased">
@@ -301,383 +287,6 @@
 
                 <div id="user-info-display" class="hidden user-display">
                     <a href="userinfo.html" id="user-email-link" class="text-gray-700 hover:text-green-600 font-semibold text-sm"></a>
-                    <span id="user-role-display" class="header-user-role"></span>
-                    <button id="logout-button">Đăng xuất</button>
-                </div>
-            </div>
-
-            <div class="md:hidden">
-                <button class="p-2 text-gray-600 hover:text-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 rounded-md">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
-                </button>
-            </div>
-        </nav>
-    </header>
-
-    <main class="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-6rem)] text-center px-4 py-16 md:py-24">
-        <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight mb-4 initial-fade-in-up">
-            SERVER HVH BEDWAR <br />
-            <span class="animate-gradient-text">NESPOLA</span>
-        </h1>
-
-        <p class="text-lg md:text-xl text-gray-600 max-w-2xl mb-8 initial-fade-in-up delay-200">
-            Khám phá thế giới Bedwars đầy kịch tính, chinh phục mọi đối thủ và trải nghiệm những trận chiến bất tận cùng cộng đồng NESPOLA!
-        </p>
-
-        <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 initial-fade-in-up delay-400">
-            <a
-                href="#content-sections" id="explore-server-btn"
-                class="flex items-center justify-center px-8 py-4 bg-green-500 text-white font-semibold rounded-lg shadow-lg hover:bg-green-600 transition-all duration-300 transform hover:scale-105"
-            >
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="text-white mr-2"
-                >
-                  <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z" />
-                  <path d="M14.71 14.71L12 17.41l-2.71-2.71a4 4 0 1 1 5.42 0z" />
-                  <path d="M16 12l-4 4-4-4" />
-                  <path d="M12 8V2" />
-                  <path d="M12 22V16" />
-                  <path d="M22 12H16" />
-                  <path d="M8 12H2" />
-                  <circle cx="12" cy="12" r="2" />
-                </svg>
-                Khám phá server
-            </a>
-            <a
-                href="./about.html"
-                class="flex items-center justify-center px-8 py-4 border-2 border-gray-300 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-100 transition-all duration-300 transform hover:scale-105">
-                Tìm hiểu thêm <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </a>
-            <a
-                href="./tut.html"
-                class="flex items-center justify-center px-8 py-4 border-2 border-gray-300 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-100 transition-all duration-300 transform hover:scale-105">
-                <i class="fas fa-book mr-2"></i> Cách vào
-            </a>
-            <button
-                id="join-server-btn"
-                class="flex items-center justify-center px-8 py-4 bg-blue-500 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-600 transition-all duration-300 transform hover:scale-105"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
-                    <path d="M12 5v14"/><path d="m19 12-7 7-7-7"/>
-                </svg>
-                Server IP
-            </button>
-        </div>
-    </main>
-
-    <section id="content-sections" class="relative z-10 py-16 md:py-24 bg-gray-50">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20 items-center animated-section slide-in-up-on-scroll">
-                <div class="order-2 md:order-1">
-                    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
-                        Kết nối và Chiến đấu
-                    </h2>
-                    <p class="text-lg text-gray-600 mb-6">
-                        Kết nối với server NESPOLA dễ dàng và nhanh chóng. Chọn chế độ Bedwars yêu thích, tham gia trận đấu và bắt đầu cuộc chiến đầy kịch tính chỉ với vài bước đơn giản!
-                    </p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700">
-                        <p class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-600"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76a6 6 0 0 0-8.49 0"/><path d="M11.66 16.34a2 2 0 0 0 2.83 0"/></svg> Phát hiện trận đấu nhanh</p>
-                        <p class="flex items-center">
-                            <!-- Fixed Bell Icon SVG -->
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-600">
-                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                                <path d="M13.73 21a2 2 0 = 1-3.46 0"></path>
-                            </svg>
-                            Thông báo sự kiện
-                        </p>
-                        <p class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-600"><path d="M22 12H2"/><path d="M15 19l7-7-7-7"/></svg> Trải nghiệm mượt mà</p>
-                        <p class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-600"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v6"/><path d="m15 15-3 3-3-3"/></svg> Server ổn định</p>
-                    </div>
-                </div>
-                <!-- Ảnh cho phần "Kết nối và Chiến đấu" -->
-                <div class="order-1 md:order-2 flex justify-center items-center w-full max-w-md bg-cover bg-center bg-no-repeat rounded-lg overflow-hidden shadow-lg aspect-video card-effect group"
-                     style="background-image: url('./anh-pvp.png');">
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20 items-center animated-section slide-in-up-on-scroll">
-                <!-- Ảnh cho phần "Theo dõi các event bạn yêu thích" -->
-                <div class="order-1 md:order-1 flex justify-center items-center w-full max-w-md bg-cover bg-center bg-no-repeat rounded-lg overflow-hidden shadow-lg aspect-video card-effect group"
-                     style="background-image: url('./anh-event.png');">
-                </div>
-                <div class="order-2 md:order-2">
-                    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
-                        Theo dõi các event bạn yêu thích
-                    </h2>
-                    <p class="text-lg text-gray-600 mb-6">
-                        Nhận thông báo mỗi khi các sự kiện hoặc giải đấu mới được tổ chức và luôn nắm bắt mọi thông tin quan trọng nhất.
-                    </p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700">
-                        <p class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-600"><path d="M6 8a6 6 0 = 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> Thông báo sự kiện</p>
-                        <p class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-600"><path d="M22 12H2"/><path d="M18 5l4 7-4 7"/><path d="M6 5l-4 7 4 7"/></svg> Cập nhật thường xuyên</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="text-center mb-16 animated-section slide-in-up-on-scroll">
-                <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
-                    Chinh phục mọi thử thách, làm chủ cuộc chơi!
-                </h2>
-                <p class="text-lg text-gray-600 max-w-3xl mx-auto">
-                    Trải nghiệm Bedwars HVH đỉnh cao với các tính năng độc quyền, giúp bạn nâng tầm kỹ năng và thể hiện bản lĩnh.
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animated-section scale-in-on-scroll">
-                <div class="p-6 bg-white rounded-lg shadow-md flex items-start space-x-4 card-effect group">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 mt-1"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76a6 6 0 0 0-8.49 0"/><path d="M11.66 16.34a2 2 0 0 0 2.83 0"/></svg>
-                    <div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Khám phá chiến trường</h3>
-                        <p class="text-gray-600">Khám phá đa dạng các bản đồ Bedwars với địa hình và chiến thuật độc đáo, không ngừng đổi mới.</p>
-                    </div>
-                </div>
-                <div class="p-6 bg-white rounded-lg shadow-md flex items-start space-x-4 card-effect group">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 mt-1"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                    <div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Đội hình bất bại</h3>
-                        <p class="text-gray-600">Lập đội cùng bạn bè, xây dựng chiến thuật thông minh và phối hợp ăn ý để thống trị mọi trận đấu.</p>
-                    </div>
-                </div>
-                <div class="p-6 bg-white rounded-lg shadow-md flex items-start space-x-4 card-effect group">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 mt-1"><path d="M15 5 6 6-6 6"/><path d="M3 12h18"/></svg>
-                    <div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Thăng cấp & Nhận thưởng</h3>
-                        <p class="text-gray-600">Đạt thứ hạng cao trên bảng xếp hạng, mở khóa phần thưởng độc quyền và chứng tỏ kỹ năng của bạn.</p>
-                    </div>
-                </div>
-                <div class="p-6 bg-white rounded-lg shadow-md flex items-start space-x-4 card-effect group">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 mt-1"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                    <div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Chế độ độc đáo</h3>
-                        <p class="text-gray-600">Trải nghiệm nhiều chế độ chơi Bedwars độc đáo, cùng các sự kiện và giải đấu hấp dẫn được tổ chức thường xuyên.</p>
-                    </div>
-                </div>
-                <div class="p-6 bg-white rounded-lg shadow-md flex items-start space-x-4 card-effect group">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 mt-1"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                    <div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Thống kê chi tiết</h3>
-                        <p class="text-gray-600">Theo dõi mọi chỉ số: KDA, win-rate, số trận thắng, và thứ hạng của bạn để cải thiện kỹ năng.</p>
-                    </div>
-                </div>
-                <div class="p-6 bg-white rounded-lg shadow-md flex items-start space-x-4 card-effect group">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 mt-1"><path d="M22 12H2"/><path d="M18 5l4 7-4 7"/><path d="M6 5l-4 7 4 7"/></svg>
-                    <div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Cập nhật không ngừng</h3>
-                        <p class="text-gray-600">Máy chủ luôn được cập nhật các bản đồ, chế độ mới và tối ưu hóa hiệu suất để mang lại trải nghiệm mượt mà nhất.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tham gia cộng đồng section -->
-            <div class="text-center mt-20 animated-section slide-in-up-on-scroll">
-                <div class="flex justify-center mb-8">
-                    <svg
-                      width="64"
-                      height="64"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="text-green-600"
-                    >
-                      <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z" />
-                      <path d="M14.71 14.71L12 17.41l-2.71-2.71a4 4 0 1 1 5.42 0z" />
-                      <path d="M16 12l-4 4-4-4" />
-                      <path d="M12 8V2" />
-                      <path d="M12 22V16" />
-                      <path d="M22 12H16" />
-                      <path d="M8 12H2" />
-                      <circle cx="12" cy="12" r="2" />
-                    </svg>
-                </div>
-                <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">
-                    Tham gia cộng đồng NESPOLA ngay!
-                </h2>
-                <a
-                    href="https://discord.gg/gYTRrGx8Vv"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105"
-                >
-                    <i class="fab fa-discord w-5 h-5 mr-2 text-xl"></i>
-                    Tham gia Discord
-                </a>
-            </div>
-
-            <!-- Chat Section -->
-            <div class="mt-20 px-4 py-8 bg-white rounded-lg shadow-xl max-w-3xl mx-auto text-left">
-                <h2 class="text-3xl font-extrabold text-gray-900 mb-6 text-center">
-                    Trò chuyện cộng đồng
-                </h2>
-                <div id="chat-messages" class="chat-container">
-                    <!-- Chat messages will be loaded here -->
-                    <p class="text-gray-500 text-center">Đang tải tin nhắn...</p>
-                </div>
-                <div class="chat-input-area">
-                    <textarea id="chat-message-input" placeholder="Nhập tin nhắn của bạn..." class="focus:outline-none focus:ring-2 focus:ring-green-500" maxlength="200"></textarea>
-                    <button id="send-chat-button">Gửi</button>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- Join Server Modal (Now displays the error message as per user request) -->
-    <div id="join-server-modal" class="modal-overlay fixed inset-0 flex items-center justify-center z-50">
-        <div class="modal-content bg-white p-8 rounded-lg shadow-xl relative w-11/12 max-w-sm text-center">
-            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
-            <h3 class="text-2xl font-bold text-red-600 mb-4">Lỗi: Server chưa phát hành!</h3>
-            <p class="text-gray-700 mb-4">
-                SERVER HVH BEDWAR NESPOLA hiện chưa được phát hành.
-            </p>
-            <p class="text-gray-700 mb-6 font-semibold">
-                Vui lòng thử lại sau hoặc theo dõi kênh Discord để nhận thông báo sớm nhất nhé!
-            </p>
-            <a
-                href="https://discord.gg/gYTRrGx8Vv"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105"
-            >
-                <i class="fab fa-discord w-5 h-5 mr-2 text-xl"></i>
-                Tham gia Discord
-            </a>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js"; 
-        import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js"; 
-        import { getFirestore, collection, query, orderBy, addDoc, serverTimestamp, onSnapshot, doc, getDoc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js"; // Added updateDoc
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
-
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "AIzaSyB2S9V-EhHHsCQ_rxEUgA5DXfeZkFwOijY",
-            authDomain: "nespola-294d7.firebaseapp.com",
-            projectId: "nespola-294d7",
-            storageBucket: "nespola-294d7.appspot.com", // Updated to appspot.com for consistency with userinfo.html
-            messagingSenderId: "893545252364",
-            appId: "1:893545252364:web:3dd780e52ef2a0b5795029",
-            measurementId: "G-2GLRRM71RV" 
-        };
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app); // Initialize Firestore
-        const analytics = getAnalytics(app);
-
-        if (typeof __initial_auth_token !== 'undefined') {
-            signInWithCustomToken(auth, __initial_auth_token).catch((error) => {
-                console.error("Lỗi khi đăng nhập bằng custom token:", error);
-                signInAnonymously(auth);
-            });
-        } else {
-            signInAnonymously(auth).catch((error) => {
-                console.error("Lỗi khi đăng nhập ẩn danh:", error);
-            });
-        }
-
-        window.firebaseApp = app;
-        window.firebaseAuth = auth;
-        window.firebaseDb = db; // Export db instance
-        window.signOut = signOut;
-        window.onAuthStateChanged = onAuthStateChanged;
-        // Export Firestore functions for use in script
-        window.firestoreCollection = collection;
-        window.firestoreQuery = query;
-        window.firestoreOrderBy = orderBy;
-        window.firestoreAddDoc = addDoc;
-        window.firestoreServerTimestamp = serverTimestamp;
-        window.firestoreOnSnapshot = onSnapshot;
-        window.firestoreDoc = doc; // Export doc for profile management
-        window.firestoreGetDoc = getDoc; // Export getDoc for profile management
-        window.firestoreSetDoc = setDoc; // Export setDoc for profile management
-        window.firestoreDeleteDoc = deleteDoc; // Export deleteDoc for message deletion
-        window.firestoreUpdateDoc = updateDoc; // Export updateDoc for role management
-        window.appId = appId; // Export appId
-
-        // Hàm cập nhật vai trò người dùng (chỉ dành cho người có quyền Co-Owner/Admin)
-        async function updateUserRole(targetUserId, newRole) {
-            // Kiểm tra quyền của người dùng hiện tại
-            if (!currentUserId || !hasModerationRights(currentUserRole)) {
-                alert("Bạn không có quyền để thay đổi vai trò của người dùng khác.");
-                return;
-            }
-
-            // Danh sách các vai trò hợp lệ (có thể tùy chỉnh)
-            const validRoles = ['Thành viên', 'Mod', 'Admin', 'Co-Owner']; 
-            if (!validRoles.includes(newRole)) {
-                alert(`Vai trò "${newRole}" không hợp lệ. Các vai trò hợp lệ: ${validRoles.join(', ')}.`);
-                return;
-            }
-
-            // Xác nhận hành động
-            if (!confirm(`Bạn có chắc muốn thay đổi vai trò của người dùng ${targetUserId} thành "${newRole}" không?`)) {
-                return;
-            }
-
-            try {
-                const userProfileRef = firestoreDoc(db, 'artifacts', appId, 'users', targetUserId, 'user_profile_data', 'profile_doc');
-                await firestoreUpdateDoc(userProfileRef, {
-                    userRole: newRole
-                });
-                console.log(`Vai trò của người dùng ${targetUserId} đã được cập nhật thành "${newRole}"`);
-                alert(`Vai trò của người dùng đã được cập nhật thành "${newRole}".`);
-            } catch (error) {
-                console.error("Lỗi khi cập nhật vai trò người dùng:", error);
-                alert("Không thể cập nhật vai trò người dùng: " + error.message);
-            }
-        }
-
-        // Export hàm để có thể gọi từ console hoặc các script khác nếu cần
-        window.updateUserRole = updateUserRole;
-    </script>
-</head>
-<body class="min-h-screen bg-white text-gray-800 antialiased">
-    <div class="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100 z-0 pointer-events-none"></div>
-    <div class="absolute inset-0 z-0 pointer-events-none" style="
-        background-image: url(&quot;data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zm0 20v-4H4v4H0v2h4v4h2v-4h4v-2H6zM36 4V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 4V0H4v4H0v2h4v4h2V6h4V4H6zM21 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM21 0v-4h-2v4h-4v2h4v4h2V6h4V4h-4zM41 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM41 0v-4h-2v4h-4v2h4v4h2V6h4V4h-4zM11 9v-4h-2v4H5v2h4v4h2v-4h4V9h-4zm0 20v-4h-2v4H5v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4H5v2h4v4h2v-4h4v-2h-4zm30-30v-4h-2v4h-4v2h4v4h2v-4h4V9h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E&quot;);
-        background-size: 100px 100px;"></div>
-
-    <header class="relative z-10 bg-white shadow-sm">
-        <nav class="container mx-auto px-4 py-4 flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-                <!-- Logo của server -->
-                <img src="./logo.png" alt="NESPOLA Server Logo" class="h-10 md:h-12 object-contain">
-            </div>
-
-            <div class="flex items-center space-x-4">
-                <span class="text-gray-600 font-semibold text-sm">v2.0</span>
-                
-                <!-- Login/Logout and User Info Display -->
-                <a
-                    href="login.html"
-                    id="login-button"
-                    class="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition-colors duration-200"
-                >
-                    <i class="fas fa-user mr-2"></i> Đăng nhập
-                </a>
-
-                <div id="user-info-display" class="hidden user-display">
-                    <a href="userinfo.html" id="user-email-link" class="text-gray-700 hover:text-green-600 font-semibold text-sm"></a>
-                    <span id="user-role-display" class="header-user-role"></span>
                     <button id="logout-button">Đăng xuất</button>
                 </div>
             </div>
@@ -942,7 +551,7 @@
             const loginButton = document.getElementById('login-button');
             const userInfoDisplay = document.getElementById('user-info-display');
             const userEmailLink = document.getElementById('user-email-link');
-            const userRoleDisplay = document.getElementById('user-role-display'); 
+            // const userRoleDisplay = document.getElementById('user-role-display'); // Removed
             const logoutButton = document.getElementById('logout-button');
 
             const joinServerBtn = document.getElementById('join-server-btn');
@@ -969,12 +578,12 @@
             const firestoreGetDoc = window.firestoreGetDoc; 
             const firestoreSetDoc = window.firestoreSetDoc; 
             const firestoreDeleteDoc = window.firestoreDeleteDoc; 
-            const firestoreUpdateDoc = window.firestoreUpdateDoc; // Import updateDoc
+            // window.firestoreUpdateDoc = updateDoc; // Removed as roles are gone
             const appId = window.appId; 
 
 
             let currentUserDisplayName = 'Khách'; 
-            let currentUserRole = 'Thành viên'; 
+            // let currentUserRole = 'Thành viên'; // Removed
             let currentUserId = null; 
 
             // Spam prevention variables
@@ -1043,14 +652,14 @@
                             if (docSnap.exists()) {
                                 const profileData = docSnap.data();
                                 currentUserDisplayName = profileData.userName || user.displayName || user.email || 'Người dùng';
-                                currentUserRole = profileData.userRole || 'Thành viên';
+                                // currentUserRole = profileData.userRole || 'Thành viên'; // Removed
                             } else {
                                 // Create a default profile if it doesn't exist
                                 currentUserDisplayName = user.displayName || user.email || 'Người dùng';
-                                currentUserRole = 'Thành viên';
+                                // currentUserRole = 'Thành viên'; // Removed
                                 await firestoreSetDoc(userProfileRef, {
                                     userName: currentUserDisplayName,
-                                    userRole: currentUserRole,
+                                    // userRole: currentUserRole, // Removed
                                     createdAt: firestoreServerTimestamp()
                                 }, { merge: true }); 
                             }
@@ -1058,17 +667,17 @@
                             console.error("Lỗi khi tải hoặc tạo hồ sơ người dùng:", profileError);
                             // Fallback to basic user info if profile loading fails
                             currentUserDisplayName = user.displayName || user.email || 'Người dùng';
-                            currentUserRole = 'Thành viên';
+                            // currentUserRole = 'Thành viên'; // Removed
                         }
                         
                         userEmailLink.textContent = currentUserDisplayName; 
                         userEmailLink.href = 'userinfo.html'; 
-                        userRoleDisplay.textContent = `(${currentUserRole})`; 
+                        // userRoleDisplay.textContent = `(${currentUserRole})`; // Removed
                     } else {
                         loginButton.classList.remove('hidden');
                         userInfoDisplay.classList.add('hidden');
                         currentUserDisplayName = 'Khách';
-                        currentUserRole = 'Thành viên';
+                        // currentUserRole = 'Thành viên'; // Removed
                         currentUserId = null; 
                     }
                 });
@@ -1080,10 +689,10 @@
                             console.log("Đăng xuất thành công!");
                             // Reset current user info and last messages after logout
                             currentUserDisplayName = 'Khách';
-                            currentUserRole = 'Thành viên';
+                            // currentUserRole = 'Thành viên'; // Removed
                             currentUserId = null;
                             userEmailLink.textContent = '';
-                            userRoleDisplay.textContent = '';
+                            // userRoleDisplay.textContent = ''; // Removed
                             lastSentMessages = []; // Clear last sent messages
                         } catch (error) {
                             console.error("Lỗi khi đăng xuất:", error);
@@ -1095,15 +704,15 @@
             }
             // --- Kết thúc logic xử lý trạng thái đăng nhập và tải thông tin hồ sơ ---
 
-            // Hàm kiểm tra quyền của người dùng (Co-Owner/Admin)
-            const hasModerationRights = (role) => {
-                return role === 'Co-Owner' || role === 'Admin';
-            };
+            // Hàm kiểm tra quyền của người dùng (Co-Owner/Admin) - Removed entirely as roles are removed
+            // const hasModerationRights = (role) => {
+            //     return role === 'Co-Owner' || role === 'Admin';
+            // };
 
             // Hàm xóa tin nhắn
-            const deleteChatMessage = async (messageId) => {
-                // Kiểm tra lại quyền trước khi cho phép xóa
-                if (!currentUserId || !hasModerationRights(currentUserRole)) {
+            const deleteChatMessage = async (messageId, messageUserId) => {
+                // Modified: Now only allows a user to delete their own messages if logged in
+                if (!currentUserId || currentUserId !== messageUserId) {
                     alert("Bạn không có quyền để xóa tin nhắn này.");
                     return;
                 }
@@ -1112,7 +721,7 @@
                     try {
                         const messageDocRef = firestoreDoc(db, "chat_messages", messageId);
                         await firestoreDeleteDoc(messageDocRef);
-                        console.log(`Tin nhắn ${messageId} đã được xóa bởi ${currentUserDisplayName} (${currentUserRole})`);
+                        console.log(`Tin nhắn ${messageId} đã được xóa bởi ${currentUserDisplayName}`);
                     } catch (error) {
                         console.error("Lỗi khi xóa tin nhắn:", error);
                         alert("Không thể xóa tin nhắn: " + error.message);
@@ -1138,7 +747,7 @@
                         messageElement.classList.add('chat-message');
                         
                         const senderName = message.userName || 'Khách';
-                        const senderRole = message.userRole || 'Thành viên'; 
+                        // const senderRole = message.userRole || 'Thành viên'; // Removed
                         const senderUserId = message.userId || 'N/A'; 
                         const timestamp = message.timestamp ? new Date(message.timestamp.toDate()).toLocaleTimeString('vi-VN') : 'Vừa xong'; 
 
@@ -1148,21 +757,20 @@
                         messageContentDiv.innerHTML = `
                             <div class="chat-message-header">
                                 ${senderName} 
-                                <span class="chat-user-role">${senderRole}</span> 
                                 <span class="text-gray-400 text-xs ml-2">${timestamp}</span>
-                                ${hasModerationRights(currentUserRole) && senderUserId !== 'anonymous' ? `<span class="message-user-id">(ID: ${senderUserId.substring(0, 5)}...)</span>` : ''}
+                                ${senderUserId !== 'anonymous' ? `<span class="message-user-id">(ID: ${senderUserId.substring(0, 5)}...)</span>` : ''}
                             </div>
                             <div class="chat-message-text">${message.text}</div>
                         `;
                         messageElement.appendChild(messageContentDiv);
 
-                        // Add delete button if current user has moderation rights
-                        if (hasModerationRights(currentUserRole)) {
+                        // Add delete button if current user is the sender of the message
+                        if (currentUserId && currentUserId === senderUserId) {
                             const deleteBtn = document.createElement('button');
                             deleteBtn.classList.add('delete-message-btn');
                             deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
-                            deleteBtn.title = 'Xóa tin nhắn';
-                            deleteBtn.addEventListener('click', () => deleteChatMessage(messageId));
+                            deleteBtn.title = 'Xóa tin nhắn của bạn';
+                            deleteBtn.addEventListener('click', () => deleteChatMessage(messageId, senderUserId));
                             messageElement.appendChild(deleteBtn);
                         }
 
@@ -1202,8 +810,8 @@
                             return;
                         }
 
-                        // Repetition check (only for non-moderators to avoid blocking valid admin commands)
-                        if (!hasModerationRights(currentUserRole) && isRepeatingMessage(messageText)) {
+                        // Repetition check (now applies to everyone as there are no moderators)
+                        if (isRepeatingMessage(messageText)) {
                              alert("Bạn vừa gửi tin nhắn này rồi. Vui lòng không gửi lại tin nhắn lặp.");
                              return;
                         }
@@ -1223,7 +831,7 @@
                             await firestoreAddDoc(messagesRef, {
                                 text: messageText,
                                 userName: currentUserDisplayName, 
-                                userRole: currentUserRole,       
+                                // userRole: currentUserRole, // Removed      
                                 userId: userId, 
                                 timestamp: firestoreServerTimestamp()
                             });
