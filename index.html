@@ -6,7 +6,7 @@
     <title>SERVER HVH BEDWAR NESPOLA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <!-- Link Font Awesome để dùng icon Discord và User vector -->
+    <!-- Link Font Awesome để dùng icon Discord, User vector và icon thùng rác -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
@@ -141,11 +141,28 @@
         }
         .chat-message {
             margin-bottom: 0.75rem;
+            display: flex;
+            align-items: flex-start; /* Align header and text at start */
+            position: relative; /* For delete button positioning */
+        }
+        .chat-message-content {
+            flex-grow: 1;
         }
         .chat-message-header {
             font-weight: 600;
             font-size: 0.875rem; /* text-sm */
             color: #2D3748; /* gray-800 */
+        }
+        /* Style for user role in chat */
+        .chat-user-role {
+            font-size: 0.75rem; /* text-xs */
+            font-weight: normal;
+            color: #6B7280; /* gray-500 */
+            margin-left: 0.5rem;
+            padding: 0.1rem 0.4rem;
+            background-color: #E5E7EB; /* gray-200 */
+            border-radius: 0.3rem;
+            vertical-align: middle;
         }
         .chat-message-text {
             font-size: 0.95rem;
@@ -177,12 +194,38 @@
         .chat-input-area button:hover {
             background-color: #10B981; /* Green-600 */
         }
+        /* Style for user role in header */
+        .header-user-role {
+            font-size: 0.75rem;
+            font-weight: normal;
+            color: #34D399; /* Green-500 */
+            margin-left: 0.5rem;
+        }
+        .delete-message-btn {
+            background: none;
+            border: none;
+            color: #EF4444; /* red-500 */
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+            padding: 0;
+            opacity: 0.6;
+            transition: opacity 0.2s ease;
+        }
+        .delete-message-btn:hover {
+            opacity: 1;
+        }
+        .message-user-id {
+            font-size: 0.7rem;
+            color: #9CA3AF; /* gray-400 */
+            margin-left: 0.5rem;
+        }
     </style>
     <!-- Firebase SDKs - Re-enabled Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js"; 
         import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js"; 
-        import { getFirestore, collection, query, orderBy, addDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js"; // Added Firestore imports
+        import { getFirestore, collection, query, orderBy, addDoc, serverTimestamp, onSnapshot, doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js"; // Added Firestore imports
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
 
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
@@ -224,6 +267,11 @@
         window.firestoreAddDoc = addDoc;
         window.firestoreServerTimestamp = serverTimestamp;
         window.firestoreOnSnapshot = onSnapshot;
+        window.firestoreDoc = doc; // Export doc for profile management
+        window.firestoreGetDoc = getDoc; // Export getDoc for profile management
+        window.firestoreSetDoc = setDoc; // Export setDoc for profile management
+        window.firestoreDeleteDoc = deleteDoc; // Export deleteDoc for message deletion
+        window.appId = appId; // Export appId
     </script>
 </head>
 <body class="min-h-screen bg-white text-gray-800 antialiased">
@@ -253,6 +301,7 @@
 
                 <div id="user-info-display" class="hidden user-display">
                     <a href="userinfo.html" id="user-email-link" class="text-gray-700 hover:text-green-600 font-semibold text-sm"></a>
+                    <span id="user-role-display" class="header-user-role"></span>
                     <button id="logout-button">Đăng xuất</button>
                 </div>
             </div>
@@ -477,7 +526,7 @@
                     <p class="text-gray-500 text-center">Đang tải tin nhắn...</p>
                 </div>
                 <div class="chat-input-area">
-                    <textarea id="chat-message-input" placeholder="Nhập tin nhắn của bạn..." class="focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+                    <textarea id="chat-message-input" placeholder="Nhập tin nhắn của bạn..." class="focus:outline-none focus:ring-2 focus:ring-green-500" maxlength="200"></textarea>
                     <button id="send-chat-button">Gửi</button>
                 </div>
             </div>
@@ -517,6 +566,7 @@
             const loginButton = document.getElementById('login-button');
             const userInfoDisplay = document.getElementById('user-info-display');
             const userEmailLink = document.getElementById('user-email-link');
+            const userRoleDisplay = document.getElementById('user-role-display'); 
             const logoutButton = document.getElementById('logout-button');
 
             const joinServerBtn = document.getElementById('join-server-btn');
@@ -532,26 +582,110 @@
             const auth = window.firebaseAuth;
             const onAuthStateChanged = window.onAuthStateChanged;
             const signOut = window.signOut;
-            const db = window.firebaseDb; // Get Firestore instance
+            const db = window.firebaseDb; 
             const firestoreCollection = window.firestoreCollection;
             const firestoreQuery = window.firestoreQuery;
             const firestoreOrderBy = window.firestoreOrderBy;
             const firestoreAddDoc = window.firestoreAddDoc;
             const firestoreServerTimestamp = window.firestoreServerTimestamp;
             const firestoreOnSnapshot = window.firestoreOnSnapshot;
+            const firestoreDoc = window.firestoreDoc; 
+            const firestoreGetDoc = window.firestoreGetDoc; 
+            const firestoreSetDoc = window.firestoreSetDoc; 
+            const firestoreDeleteDoc = window.firestoreDeleteDoc; 
+            const appId = window.appId; 
 
 
-            // --- Logic xử lý trạng thái đăng nhập ---
-            if (auth && onAuthStateChanged) {
-                onAuthStateChanged(auth, (user) => {
+            let currentUserDisplayName = 'Khách'; 
+            let currentUserRole = 'Thành viên'; 
+            let currentUserId = null; 
+
+            // Spam prevention variables
+            let lastMessageTime = 0;
+            const MESSAGE_COOLDOWN = 2000; // 2 seconds cooldown
+            const MAX_MESSAGE_LENGTH = 200; // Max 200 characters
+            const LAST_MESSAGES_TO_CHECK = 3; // Number of previous messages to check for repetition
+            let lastSentMessages = []; // Stores the content of the last sent messages
+
+            // Simple forbidden words list (client-side, easily bypassed)
+            const forbiddenWords = [
+                'địt', 'đụ', 'buồi', 'lồn', 'cặc', 'chửi tục', 'đm', 'dm', 'fuck', 'bitch', 
+                'đĩ', 'phò', 'đầu b**i', 'lon', 'cai', 'dit me', 'du me', 'vc', 'vcl', 'cc', 
+                'cl', 'clgt', 'đcm', 'concac', 'ditconme', 'dau boi', 'loz', 'cac', 'ccmm', 'xoạc', 'súc vật', 'ngu lol'
+            ]; // Updated forbidden words
+
+
+            // Hàm chuẩn hóa chuỗi để so sánh (loại bỏ khoảng trắng thừa, chuyển về chữ thường)
+            const normalizeString = (str) => {
+                // Loại bỏ dấu câu và chuyển về chữ thường, sau đó loại bỏ khoảng trắng thừa
+                return str.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").replace(/\s+/g,' ').trim();
+            };
+
+            // Hàm kiểm tra tin nhắn có chứa từ cấm không
+            const containsForbiddenWord = (message) => {
+                const normalizedMessage = normalizeString(message);
+                for (let word of forbiddenWords) {
+                    // Chuẩn hóa từ cấm và kiểm tra
+                    if (normalizedMessage.includes(normalizeString(word))) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+
+            // Hàm kiểm tra tin nhắn lặp lại
+            const isRepeatingMessage = (message) => {
+                const normalizedNewMessage = normalizeString(message);
+                return lastSentMessages.some(lastMsg => {
+                    const normalizedLastMsg = normalizeString(lastMsg);
+                    // Có thể thêm ngưỡng tương tự nếu muốn (ví dụ, >90% giống nhau)
+                    // Hiện tại chỉ so sánh y hệt để đơn giản
+                    return normalizedNewMessage === normalizedLastMsg;
+                });
+            };
+
+
+            // --- Logic xử lý trạng thái đăng nhập và tải thông tin hồ sơ ---
+            if (auth && onAuthStateChanged && db && firestoreDoc && firestoreGetDoc && firestoreSetDoc) {
+                onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         loginButton.classList.add('hidden');
                         userInfoDisplay.classList.remove('hidden');
-                        userEmailLink.textContent = user.displayName || user.email || 'Người dùng'; 
-                        userEmailLink.href = 'userinfo.html'; // Link to userinfo.html
+                        currentUserId = user.uid; 
+
+                        const userProfileRef = firestoreDoc(db, 'artifacts', appId, 'users', user.uid, 'user_profile_data', 'profile_doc');
+                        try {
+                            const docSnap = await firestoreGetDoc(userProfileRef);
+                            if (docSnap.exists()) {
+                                const profileData = docSnap.data();
+                                currentUserDisplayName = profileData.userName || user.displayName || user.email || 'Người dùng';
+                                currentUserRole = profileData.userRole || 'Thành viên';
+                            } else {
+                                // Create a default profile if it doesn't exist
+                                currentUserDisplayName = user.displayName || user.email || 'Người dùng';
+                                currentUserRole = 'Thành viên';
+                                await firestoreSetDoc(userProfileRef, {
+                                    userName: currentUserDisplayName,
+                                    userRole: currentUserRole,
+                                    createdAt: firestoreServerTimestamp()
+                                }, { merge: true }); 
+                            }
+                        } catch (profileError) {
+                            console.error("Lỗi khi tải hoặc tạo hồ sơ người dùng:", profileError);
+                            // Fallback to basic user info if profile loading fails
+                            currentUserDisplayName = user.displayName || user.email || 'Người dùng';
+                            currentUserRole = 'Thành viên';
+                        }
+                        
+                        userEmailLink.textContent = currentUserDisplayName; 
+                        userEmailLink.href = 'userinfo.html'; 
+                        userRoleDisplay.textContent = `(${currentUserRole})`; 
                     } else {
                         loginButton.classList.remove('hidden');
                         userInfoDisplay.classList.add('hidden');
+                        currentUserDisplayName = 'Khách';
+                        currentUserRole = 'Thành viên';
+                        currentUserId = null; 
                     }
                 });
 
@@ -560,40 +694,94 @@
                         try {
                             await signOut(auth);
                             console.log("Đăng xuất thành công!");
+                            // Reset current user info and last messages after logout
+                            currentUserDisplayName = 'Khách';
+                            currentUserRole = 'Thành viên';
+                            currentUserId = null;
+                            userEmailLink.textContent = '';
+                            userRoleDisplay.textContent = '';
+                            lastSentMessages = []; // Clear last sent messages
                         } catch (error) {
                             console.error("Lỗi khi đăng xuất:", error);
                         }
                     });
                 }
             } else {
-                console.error("Firebase Auth hoặc onAuthStateChanged chưa được khởi tạo. Đảm bảo bạn đã import đúng.");
+                console.error("Firebase Auth, Firestore hoặc các hàm liên quan chưa được khởi tạo. Đảm bảo bạn đã import đúng.");
             }
-            // --- Kết thúc logic xử lý trạng thái đăng nhập ---
+            // --- Kết thúc logic xử lý trạng thái đăng nhập và tải thông tin hồ sơ ---
 
+            // Hàm kiểm tra quyền của người dùng (Co-Owner/Admin)
+            const hasModerationRights = (role) => {
+                return role === 'Co-Owner' || role === 'Admin';
+            };
+
+            // Hàm xóa tin nhắn
+            const deleteChatMessage = async (messageId) => {
+                // Kiểm tra lại quyền trước khi cho phép xóa
+                if (!currentUserId || !hasModerationRights(currentUserRole)) {
+                    alert("Bạn không có quyền để xóa tin nhắn này.");
+                    return;
+                }
+
+                if (confirm("Bạn có chắc muốn xóa tin nhắn này?")) { 
+                    try {
+                        const messageDocRef = firestoreDoc(db, "chat_messages", messageId);
+                        await firestoreDeleteDoc(messageDocRef);
+                        console.log(`Tin nhắn ${messageId} đã được xóa bởi ${currentUserDisplayName} (${currentUserRole})`);
+                    } catch (error) {
+                        console.error("Lỗi khi xóa tin nhắn:", error);
+                        alert("Không thể xóa tin nhắn: " + error.message);
+                    }
+                }
+            };
 
             // --- Logic cho chức năng chat ---
-            if (db && firestoreCollection && firestoreQuery && firestoreOrderBy && firestoreOnSnapshot) {
+            if (db && firestoreCollection && firestoreQuery && firestoreOrderBy && firestoreOnSnapshot && firestoreDeleteDoc) {
                 const messagesRef = firestoreCollection(db, "chat_messages");
-                const q = firestoreQuery(messagesRef, firestoreOrderBy("timestamp")); // Sắp xếp theo thời gian
+                const q = firestoreQuery(messagesRef, firestoreOrderBy("timestamp")); 
 
                 // Lắng nghe tin nhắn theo thời gian thực
                 firestoreOnSnapshot(q, (snapshot) => {
-                    chatMessagesDiv.innerHTML = ''; // Xóa tin nhắn cũ
+                    chatMessagesDiv.innerHTML = ''; 
                     if (snapshot.empty) {
                         chatMessagesDiv.innerHTML = '<p class="text-gray-500 text-center">Chưa có tin nhắn nào. Hãy là người đầu tiên gửi tin!</p>';
                     }
                     snapshot.forEach((doc) => {
                         const message = doc.data();
+                        const messageId = doc.id; 
                         const messageElement = document.createElement('div');
                         messageElement.classList.add('chat-message');
                         
-                        const senderName = message.userName || 'Khách'; // Default to 'Khách'
-                        const timestamp = message.timestamp ? new Date(message.timestamp.toDate()).toLocaleTimeString() : 'Vừa xong';
+                        const senderName = message.userName || 'Khách';
+                        const senderRole = message.userRole || 'Thành viên'; 
+                        const senderUserId = message.userId || 'N/A'; 
+                        const timestamp = message.timestamp ? new Date(message.timestamp.toDate()).toLocaleTimeString('vi-VN') : 'Vừa xong'; 
 
-                        messageElement.innerHTML = `
-                            <div class="chat-message-header">${senderName} <span class="text-gray-400 text-xs ml-2">${timestamp}</span></div>
+                        // Create the message content
+                        const messageContentDiv = document.createElement('div');
+                        messageContentDiv.classList.add('chat-message-content');
+                        messageContentDiv.innerHTML = `
+                            <div class="chat-message-header">
+                                ${senderName} 
+                                <span class="chat-user-role">${senderRole}</span> 
+                                <span class="text-gray-400 text-xs ml-2">${timestamp}</span>
+                                ${hasModerationRights(currentUserRole) && senderUserId !== 'anonymous' ? `<span class="message-user-id">(ID: ${senderUserId.substring(0, 5)}...)</span>` : ''}
+                            </div>
                             <div class="chat-message-text">${message.text}</div>
                         `;
+                        messageElement.appendChild(messageContentDiv);
+
+                        // Add delete button if current user has moderation rights
+                        if (hasModerationRights(currentUserRole)) {
+                            const deleteBtn = document.createElement('button');
+                            deleteBtn.classList.add('delete-message-btn');
+                            deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+                            deleteBtn.title = 'Xóa tin nhắn';
+                            deleteBtn.addEventListener('click', () => deleteChatMessage(messageId));
+                            messageElement.appendChild(deleteBtn);
+                        }
+
                         chatMessagesDiv.appendChild(messageElement);
                     });
                     // Cuộn xuống cuối chat
@@ -602,7 +790,7 @@
                     console.error("Lỗi khi tải tin nhắn chat:", error);
                     if (error.code === 'permission-denied') {
                         chatMessagesDiv.innerHTML = '<p class="text-red-500 text-center">Lỗi quyền truy cập: Không thể tải tin nhắn. Vui lòng kiểm tra quy tắc bảo mật Firebase Firestore của bạn.</p>';
-                        console.error("Vui lòng kiểm tra quy tắc bảo mật Firebase Firestore của bạn để cho phép đọc/ghi vào collection 'chat_messages'.");
+                        console.error("Vui lòng kiểm tra quy tắc bảo mật Firebase Firestore của bạn để cho phép đọc/ghi vào collection 'chat_messages' và 'user_profile_data'.");
                     } else {
                         chatMessagesDiv.innerHTML = `<p class="text-red-500 text-center">Không thể tải tin nhắn chat: ${error.message}.</p>`;
                     }
@@ -612,26 +800,63 @@
                 if (sendChatButton && chatMessageInput && firestoreAddDoc && firestoreServerTimestamp) {
                     sendChatButton.addEventListener('click', async () => {
                         const messageText = chatMessageInput.value.trim();
-                        if (messageText === '') return;
+
+                        // Client-side spam checks
+                        if (messageText === '') {
+                            alert("Tin nhắn không được để trống.");
+                            return;
+                        }
+                        if (messageText.length > MAX_MESSAGE_LENGTH) {
+                            alert(`Tin nhắn quá dài. Vui lòng nhập tối đa ${MAX_MESSAGE_LENGTH} ký tự.`);
+                            return;
+                        }
+
+                        // Cooldown check
+                        const currentTime = Date.now();
+                        if (currentTime - lastMessageTime < MESSAGE_COOLDOWN) {
+                            alert(`Vui lòng chờ ${MESSAGE_COOLDOWN / 1000} giây trước khi gửi tin nhắn tiếp theo.`);
+                            return;
+                        }
+
+                        // Repetition check (only for non-moderators to avoid blocking valid admin commands)
+                        if (!hasModerationRights(currentUserRole) && isRepeatingMessage(messageText)) {
+                             alert("Bạn vừa gửi tin nhắn này rồi. Vui lòng không gửi lại tin nhắn lặp.");
+                             return;
+                        }
+                        
+                        // Forbidden words check
+                        if (containsForbiddenWord(messageText)) {
+                            alert("Tin nhắn chứa từ ngữ không phù hợp. Vui lòng sử dụng ngôn ngữ văn minh.");
+                            return;
+                        }
+
+                        lastMessageTime = currentTime; // Update last send time
 
                         const user = auth.currentUser;
-                        const userName = user ? (user.displayName || user.email || 'Người dùng đã đăng nhập') : 'Khách';
-                        const userId = user ? user.uid : 'anonymous'; // Lấy UID nếu có, hoặc dùng 'anonymous'
+                        const userId = user ? user.uid : 'anonymous'; 
 
                         try {
                             await firestoreAddDoc(messagesRef, {
                                 text: messageText,
-                                userName: userName,
-                                userId: userId, // Lưu userId để quản lý
+                                userName: currentUserDisplayName, 
+                                userRole: currentUserRole,       
+                                userId: userId, 
                                 timestamp: firestoreServerTimestamp()
                             });
-                            chatMessageInput.value = ''; // Xóa nội dung input sau khi gửi
-                            chatMessageInput.style.height = 'auto'; // Reset chiều cao textarea
+                            chatMessageInput.value = ''; 
+                            chatMessageInput.style.height = 'auto'; 
+
+                            // Add sent message to history for repetition check
+                            lastSentMessages.push(messageText);
+                            if (lastSentMessages.length > LAST_MESSAGES_TO_CHECK) {
+                                lastSentMessages.shift(); // Remove the oldest message
+                            }
+
                         } catch (error) {
                             console.error("Lỗi khi gửi tin nhắn:", error);
                             if (error.code === 'permission-denied') {
                                 alert("Lỗi quyền truy cập: Bạn không có quyền gửi tin nhắn. Vui lòng kiểm tra quy tắc bảo mật Firebase Firestore của bạn.");
-                                console.error("Vui lòng kiểm tra quy tắc bảo mật Firebase Firestore của bạn để cho phép đọc/ghi vào collection 'chat_messages'.");
+                                console.error("Vui lòng kiểm tra quy tắc bảo mật Firebase Firestore của bạn để cho phép đọc/ghi vào collection 'chat_messages' và 'user_profile_data'.");
                             } else {
                                 alert("Không thể gửi tin nhắn: " + error.message); 
                             }
@@ -647,8 +872,8 @@
                     // Xử lý sự kiện bàn phím cho chat input: Enter để gửi, Shift+Enter để xuống dòng
                     chatMessageInput.addEventListener('keydown', (event) => {
                         if (event.key === 'Enter' && !event.shiftKey) {
-                            event.preventDefault(); // Ngăn hành vi mặc định (xuống dòng)
-                            sendChatButton.click(); // Gửi tin nhắn
+                            event.preventDefault(); 
+                            sendChatButton.click(); 
                         }
                         // Nếu là Shift+Enter, không làm gì cả, cho phép xuống dòng mặc định
                     });
@@ -687,32 +912,26 @@
             // Event listener for closing the modal by clicking outside its content
             if (joinServerModal) {
                 joinServerModal.addEventListener('click', (e) => {
-                    if (e.target === joinServerModal) { // Check if click target is the overlay itself
+                    if (e.target === joinServerModal) { 
                         closeAndResetModal();
                     }
                 });
             }
 
             // Intersection Observer for scroll-triggered animations (animate elements as they come into view)
-            const animateOnScrollElements = document.querySelectorAll('.animated-section'); // Đã chỉnh sang animated-section
+            const animateOnScrollElements = document.querySelectorAll('.animated-section'); 
 
             const observerOptions = {
-                root: null, // Use the viewport as the root
+                root: null, 
                 rootMargin: '0px',
-                threshold: 0.1 // Trigger when 10% of the element is visible
+                threshold: 0.1 
             };
 
             const observer = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('is-visible');
-                        // Có thể dừng quan sát sau khi đã nhìn thấy để animation chỉ chạy một lần
-                        // Nếu muốn animation chạy lại mỗi lần cuộn qua, hãy bỏ dòng này
-                        // observer.unobserve(entry.target); 
-                    } else {
-                        // Nếu muốn animation reset khi cuộn ra khỏi viewport
-                        // entry.target.classList.remove('is-visible');
-                    }
+                    } 
                 });
             }, observerOptions);
 
