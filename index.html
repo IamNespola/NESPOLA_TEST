@@ -67,6 +67,10 @@
             background-clip: text; /* Thêm dòng này cho tương thích tốt hơn */
             -webkit-text-fill-color: transparent;
             animation: gradient-breath 4s ease infinite; /* Thời gian animation dài hơn, mượt mà */
+            /* Thêm hiệu ứng glow cho chữ NESPOLA */
+            text-shadow: 0 0 10px rgba(52, 211, 153, 0.7), /* Green-500 with 70% opacity */
+                         0 0 20px rgba(52, 211, 153, 0.5); /* Green-500 with 50% opacity */
+            transition: text-shadow 0.3s ease; /* Thêm transition cho mượt mà */
         }
 
         .modal {
@@ -74,7 +78,8 @@
         }
         .card-effect {
             border: 1px solid transparent;
-            transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+            /* Cập nhật easing animation cho mượt mà hơn */
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         .card-effect:hover {
             border-color: #34D399;
@@ -218,13 +223,64 @@
         #ban-modal .modal-content p {
             color: #B91C1C; /* Red-700 */
         }
+
+        /* Styles for Mouse-follow Spotlight and Glow effect (no blur) */
+        .spotlight-image-card {
+            position: relative;
+            overflow: hidden;
+            cursor: none; /* Hide default cursor when over the card */
+            border-radius: 0.5rem;
+            background-size: cover;
+            background-position: center;
+            /* background-image will be set by JS via --image-url CSS variable */
+            
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Base shadow for the card */
+            transition: box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            
+            /* CSS variables for smooth transitions */
+            --mouse-x: 50%;
+            --mouse-y: 50%;
+            --glow-size: 0px; /* Initial size for the glow halo */
+            --glow-blur: 0px; /* Initial blur for the glow halo */
+            --glow-opacity: 0; /* Initial opacity for the glow halo */
+        }
+
+        /* New element for the glowing halo around the spotlight */
+        .spotlight-image-card .glow-halo {
+            position: absolute;
+            top: var(--mouse-y); /* Controlled by JS */
+            left: var(--mouse-x); /* Controlled by JS */
+            width: var(--glow-size); /* Controlled by JS, initially 0 */
+            height: var(--glow-size); /* Controlled by JS, initially 0 */
+            transform: translate(-50%, -50%); /* Center the glow around mouse */
+            /* Đã đổi màu glow sang xanh lá */
+            background: radial-gradient(circle, rgba(52, 211, 153, 0.3), transparent 70%); /* Green-ish glow color */
+            filter: blur(var(--glow-blur)); /* Controlled by JS */
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: var(--glow-opacity); /* Controlled by JS, initially hidden */
+            transition: opacity 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                        width 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                        height 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 3; /* On top of everything */
+        }
+
+        /* Hover effects on the card itself for overall glow */
+        .spotlight-image-card:hover {
+            box-shadow: 0 0 15px rgba(52, 211, 153, 0.4), 0 0 30px rgba(52, 211, 153, 0.2); /* Green glow for the card border */
+        }
+
+        /* New class for button hover effect */
+        .button-hover-effect:hover {
+            box-shadow: 0 0 15px rgba(52, 211, 153, 0.4), 0 0 30px rgba(52, 211, 153, 0.2); /* Green glow for the button */
+        }
     </style>
-    <!-- Firebase SDKs - Re-enabled Firebase SDKs -->
+    <!-- Firebase SDKs -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js"; 
-        import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js"; 
-        import { getFirestore, collection, query, orderBy, addDoc, serverTimestamp, onSnapshot, doc, getDoc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js"; 
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js"; 
+        import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js"; 
+        import { getFirestore, collection, query, orderBy, addDoc, serverTimestamp, onSnapshot, doc, getDoc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js"; 
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-analytics.js";
 
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyB2S9V-EhHHsCQ_rxEUgA5DXfeZkFwOijY",
@@ -327,7 +383,7 @@
         <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 initial-fade-in-up delay-400">
             <a
                 href="#content-sections" id="explore-server-btn"
-                class="flex items-center justify-center px-8 py-4 bg-green-500 text-white font-semibold rounded-lg shadow-lg hover:bg-green-600 transition-all duration-300 transform hover:scale-105"
+                class="flex items-center justify-center px-8 py-4 bg-green-500 text-white font-semibold rounded-lg shadow-lg hover:bg-green-600 transition-all duration-300 transform hover:scale-105 button-hover-effect"
             >
                 <svg
                   width="24"
@@ -353,17 +409,17 @@
             </a>
             <a
                 href="./about.html"
-                class="flex items-center justify-center px-8 py-4 border-2 border-gray-300 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-100 transition-all duration-300 transform hover:scale-105">
+                class="flex items-center justify-center px-8 py-4 border-2 border-gray-300 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 button-hover-effect">
                 Tìm hiểu thêm <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </a>
             <a
                 href="./tut.html"
-                class="flex items-center justify-center px-8 py-4 border-2 border-gray-300 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-100 transition-all duration-300 transform hover:scale-105">
+                class="flex items-center justify-center px-8 py-4 border-2 border-gray-300 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 button-hover-effect">
                 <i class="fas fa-book mr-2"></i> Cách vào
             </a>
             <button
                 id="join-server-btn"
-                class="flex items-center justify-center px-8 py-4 bg-blue-500 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-600 transition-all duration-300 transform hover:scale-105"
+                class="flex items-center justify-center px-8 py-4 bg-blue-500 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-600 transition-all duration-300 transform hover:scale-105 button-hover-effect"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
                     <path d="M12 5v14"/><path d="m19 12-7 7-7-7"/>
@@ -398,15 +454,17 @@
                     </div>
                 </div>
                 <!-- Ảnh cho phần "Kết nối và Chiến đấu" -->
-                <div class="order-1 md:order-2 flex justify-center items-center w-full max-w-md bg-cover bg-center bg-no-repeat rounded-lg overflow-hidden shadow-lg aspect-video card-effect group"
-                     style="background-image: url('./anh-pvp.png');">
+                <div class="order-1 md:order-2 flex justify-center items-center w-full max-w-md rounded-lg overflow-hidden shadow-lg aspect-video card-effect group spotlight-image-card"
+                     data-image-src="./anh-pvp.png">
+                    <div class="glow-halo"></div> <!-- Thêm phần tử cho hiệu ứng glow -->
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20 items-center animated-section slide-in-up-on-scroll">
                 <!-- Ảnh cho phần "Theo dõi các event bạn yêu thích" -->
-                <div class="order-1 md:order-1 flex justify-center items-center w-full max-w-md bg-cover bg-center bg-no-repeat rounded-lg overflow-hidden shadow-lg aspect-video card-effect group"
-                     style="background-image: url('./anh-event.png');">
+                <div class="order-1 md:order-1 flex justify-center items-center w-full max-w-md rounded-lg overflow-hidden shadow-lg aspect-video card-effect group spotlight-image-card"
+                     data-image-src="./anh-event.png">
+                    <div class="glow-halo"></div> <!-- Thêm phần tử cho hiệu ứng glow -->
                 </div>
                 <div class="order-2 md:order-2">
                     <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
@@ -610,7 +668,7 @@
             const firestoreGetDoc = window.firestoreGetDoc; 
             const firestoreSetDoc = window.firestoreSetDoc; 
             const firestoreDeleteDoc = window.firestoreDeleteDoc; 
-            const firestoreUpdateDoc = window.firestoreUpdateDoc; // Import updateDoc
+            const firestoreUpdateDoc = window.firestoreUpdateDoc; // Export updateDoc
             const appId = window.appId; 
 
 
@@ -1080,6 +1138,47 @@
             // Observe each element with the 'animated-section' class
             animateOnScrollElements.forEach(element => {
                 observer.observe(element);
+            });
+
+            // Add Mouse-follow Spotlight and Glow effect to image cards
+            const spotlightImageCards = document.querySelectorAll('.spotlight-image-card');
+
+            spotlightImageCards.forEach(card => {
+                const imageUrl = card.dataset.imageSrc;
+                card.style.setProperty('--image-url', `url('${imageUrl}')`); // Set CSS variable for image
+
+                // Create the glow-halo element if it doesn't exist
+                let glowHalo = card.querySelector('.glow-halo');
+                if (!glowHalo) {
+                    glowHalo = document.createElement('div');
+                    glowHalo.classList.add('glow-halo');
+                    card.appendChild(glowHalo);
+                }
+
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left; // x position within the element.
+                    const y = e.clientY - rect.top;  // y position within the element.
+
+                    // Update CSS variables for the glow halo
+                    card.style.setProperty('--mouse-x', `${x}px`);
+                    card.style.setProperty('--mouse-y', `${y}px`);
+                    card.style.setProperty('--glow-size', '300px'); // Size of the glow
+                    card.style.setProperty('--glow-blur', '40px'); // Blur of the glow
+                    card.style.setProperty('--glow-opacity', '1'); // Make glow visible
+                });
+
+                card.addEventListener('mouseenter', () => {
+                    card.style.setProperty('--glow-size', '300px');
+                    card.style.setProperty('--glow-blur', '40px');
+                    card.style.setProperty('--glow-opacity', '1');
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    card.style.setProperty('--glow-size', '0px'); // Shrink glow
+                    card.style.setProperty('--glow-blur', '0px'); // Reduce blur
+                    card.style.setProperty('--glow-opacity', '0'); // Hide glow
+                });
             });
         });
     </script>
