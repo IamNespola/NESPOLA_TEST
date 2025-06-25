@@ -83,7 +83,8 @@
         }
         .card-effect:hover {
             border-color: #34D399;
-            box-shadow: 0 10px 15px -3px rgba(52, 211, 153, 0.3), 0 4px 6px -2px rgba(52, 211, 153, 0.15);
+            /* Mạnh hơn glow cho card */
+            box-shadow: 0 0 15px rgba(52, 211, 153, 0.4), 0 0 30px rgba(52, 211, 153, 0.2); /* Green glow for the card border */
             transform: translateY(-5px);
         }
         /* Custom selection highlight color */
@@ -224,51 +225,55 @@
             color: #B91C1C; /* Red-700 */
         }
 
-        /* Styles for Mouse-follow Spotlight and Glow effect (no blur) */
+        /* Styles for Mouse-follow Spotlight and Glow effect (no blur) - COMMENTED OUT */
+        /*
         .spotlight-image-card {
             position: relative;
             overflow: hidden;
-            cursor: none; /* Hide default cursor when over the card */
+            cursor: none;
             border-radius: 0.5rem;
             background-size: cover;
             background-position: center;
-            /* background-image will be set by JS via --image-url CSS variable */
+            background-image: var(--image-url);
             
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Base shadow for the card */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
             transition: box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             
-            /* CSS variables for smooth transitions */
             --mouse-x: 50%;
             --mouse-y: 50%;
-            --glow-size: 0px; /* Initial size for the glow halo */
-            --glow-blur: 0px; /* Initial blur for the glow halo */
-            --glow-opacity: 0; /* Initial opacity for the glow halo */
+            --glow-size: 0px;
+            --glow-blur: 0px;
+            --glow-opacity: 0;
         }
+        */
 
-        /* New element for the glowing halo around the spotlight */
+        /* New element for the glowing halo around the spotlight - COMMENTED OUT */
+        /*
         .spotlight-image-card .glow-halo {
             position: absolute;
-            top: var(--mouse-y); /* Controlled by JS */
-            left: var(--mouse-x); /* Controlled by JS */
-            width: var(--glow-size); /* Controlled by JS, initially 0 */
-            height: var(--glow-size); /* Controlled by JS, initially 0 */
-            transform: translate(-50%, -50%); /* Center the glow around mouse */
-            /* Đã đổi màu glow sang xanh lá */
-            background: radial-gradient(circle, rgba(52, 211, 153, 0.3), transparent 70%); /* Green-ish glow color */
-            filter: blur(var(--glow-blur)); /* Controlled by JS */
+            top: var(--mouse-y);
+            left: var(--mouse-x);
+            width: var(--glow-size);
+            height: var(--glow-size);
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(52, 211, 153, 0.3), transparent 70%);
+            filter: blur(var(--glow-blur));
             border-radius: 50%;
             pointer-events: none;
-            opacity: var(--glow-opacity); /* Controlled by JS, initially hidden */
+            opacity: var(--glow-opacity);
             transition: opacity 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
                         width 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
                         height 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            z-index: 3; /* On top of everything */
+            z-index: 3;
         }
+        */
 
-        /* Hover effects on the card itself for overall glow */
+        /* Hover effects on the card itself for overall glow - COMMENTED OUT */
+        /*
         .spotlight-image-card:hover {
-            box-shadow: 0 0 15px rgba(52, 211, 153, 0.4), 0 0 30px rgba(52, 211, 153, 0.2); /* Green glow for the card border */
+            box-shadow: 0 0 15px rgba(52, 211, 153, 0.4), 0 0 30px rgba(52, 211, 153, 0.2);
         }
+        */
 
         /* New class for button hover effect */
         .button-hover-effect:hover {
@@ -454,17 +459,15 @@
                     </div>
                 </div>
                 <!-- Ảnh cho phần "Kết nối và Chiến đấu" -->
-                <div class="order-1 md:order-2 flex justify-center items-center w-full max-w-md rounded-lg overflow-hidden shadow-lg aspect-video card-effect group spotlight-image-card"
-                     data-image-src="./anh-pvp.png">
-                    <div class="glow-halo"></div> <!-- Thêm phần tử cho hiệu ứng glow -->
+                <div class="order-1 md:order-2 flex justify-center items-center w-full max-w-md rounded-lg overflow-hidden shadow-lg aspect-video card-effect group"
+                     data-image-src="./anh-pvp.png" style="background-image: url('./anh-pvp.png'); background-size: cover; background-position: center;">
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20 items-center animated-section slide-in-up-on-scroll">
                 <!-- Ảnh cho phần "Theo dõi các event bạn yêu thích" -->
-                <div class="order-1 md:order-1 flex justify-center items-center w-full max-w-md rounded-lg overflow-hidden shadow-lg aspect-video card-effect group spotlight-image-card"
-                     data-image-src="./anh-event.png">
-                    <div class="glow-halo"></div> <!-- Thêm phần tử cho hiệu ứng glow -->
+                <div class="order-1 md:order-1 flex justify-center items-center w-full max-w-md rounded-lg overflow-hidden shadow-lg aspect-video card-effect group"
+                     data-image-src="./anh-event.png" style="background-image: url('./anh-event.png'); background-size: cover; background-position: center;">
                 </div>
                 <div class="order-2 md:order-2">
                     <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
@@ -1141,6 +1144,8 @@
             });
 
             // Add Mouse-follow Spotlight and Glow effect to image cards
+            // Removed this functionality as per user request to move effects to boxes
+            /*
             const spotlightImageCards = document.querySelectorAll('.spotlight-image-card');
 
             spotlightImageCards.forEach(card => {
@@ -1180,6 +1185,7 @@
                     card.style.setProperty('--glow-opacity', '0'); // Hide glow
                 });
             });
+            */
         });
     </script>
 </body>
